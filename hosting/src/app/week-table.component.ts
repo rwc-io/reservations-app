@@ -112,7 +112,6 @@ export class WeekTableComponent {
   private _bookers: WritableSignal<Booker[]> = signal([]);
   private _currentBooker: WritableSignal<Booker | undefined> = signal(undefined);
   private _reservations: Reservation[] = [];
-  private _permissions: Permissions = {adminUserIds: []};
   private _pricingTiers: PricingTierMap = {};
   private _units: BookableUnit[] = [];
   private _weeks: ReservableWeek[] = [];
@@ -203,12 +202,6 @@ export class WeekTableComponent {
   @Input()
   set weeks(value: ReservableWeek[]) {
     this._weeks = value;
-    this.buildTableRows();
-  }
-
-  @Input()
-  set permissions(value: Permissions) {
-    this._permissions = value;
     this.buildTableRows();
   }
 
