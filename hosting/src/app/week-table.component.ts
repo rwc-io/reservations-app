@@ -280,6 +280,7 @@ export class WeekTableComponent {
         initialGuestName: existingReservation?.guestName,
         initialBookerId: existingReservation?.bookerId,
         existingReservationId: existingReservation?.id,
+        canDelete: !!existingReservation && this.canDeleteReservation(existingReservation),
       } as ReserveDialogData,
       ...ANIMATION_SETTINGS,
     });
@@ -316,6 +317,13 @@ export class WeekTableComponent {
   }
 
   canEditReservation(reservation: WeekReservation): boolean {
+    if (this.actingAsAdmin()) {
+      return true;
+    }
+    return reservation.bookerId === this._currentBooker()?.id;
+  }
+
+  canDeleteReservation(reservation: WeekReservation): boolean {
     if (this.actingAsAdmin()) {
       return true;
     }

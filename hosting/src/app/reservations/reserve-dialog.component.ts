@@ -39,6 +39,7 @@ export interface ReserveDialogData {
   existingReservationId?: string;
   allowDailyReservations: boolean;
   blockedDates: Set<string>;
+  canDelete: boolean;
 }
 
 @Component({
@@ -89,6 +90,7 @@ export class ReserveDialog {
   readonly unitPricing: UnitPricing[];
   readonly blockedDates: Set<string> = new Set();
   readonly isDateAvailable = this.isDateAvailableBuilder();
+  protected readonly canDelete;
 
   reservation = output<Reservation>();
   deleteReservation = output<void>();
@@ -99,6 +101,7 @@ export class ReserveDialog {
     this.unitPricing = data.unitPricing;
     this.bookers = data.bookers;
     this.blockedDates = data.blockedDates || new Set();
+    this.canDelete = data.canDelete;
 
     this.weekStartDate = data.weekStartDate;
     this.weekEndDate = data.weekEndDate;
