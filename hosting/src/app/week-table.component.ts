@@ -241,13 +241,13 @@ export class WeekTableComponent {
     const bookers = this._bookers;
 
     return bookers().filter(booker => {
-      return this.isAdmin() || booker.userId === currentBooker()?.userId;
+      return this.actingAsAdmin() || booker.userId === currentBooker()?.userId;
     });
   }
 
   addReservation(weekRow: WeekRow, unit: BookableUnit, startDate: DateTime, endDate: DateTime) {
     const unitPricing = this._unitPricing[unit.id] || [];
-    const allowDailyReservations = this.isAdmin() || this.reservationsRoundsService.currentRound()?.allowDailyReservations || false;
+    const allowDailyReservations = this.actingAsAdmin() || this.reservationsRoundsService.currentRound()?.allowDailyReservations || false;
     const blockedDates = this.blockedDaysFor(weekRow.reservations[unit.id])
 
     const dialogRef = this.dialog.open(ReserveDialog, {
@@ -272,18 +272,17 @@ export class WeekTableComponent {
     });
   }
 
-  isAdmin(): boolean {
-    const currentUser = this.auth.currentUser?.uid || '<nobody>';
+  actingAsAdmin(): boolean {
     // There is no admin booker. If one is set (whether as an override, or
     // otherwise) don't set the admin status.
     if (this._currentBooker()?.id) {
       return false;
     }
-    return this._permissions.adminUserIds.includes(currentUser);
+    return this.dataService.isAdmin();
   }
 
   canAddReservation(): boolean {
-    if (this.isAdmin()) {
+    if (this.actingAsAdmin()) {
       return true;
     }
     const currentBooker = this._currentBooker();
@@ -300,18 +299,18 @@ export class WeekTableComponent {
   }
 
   canAddDailyReservation(): boolean {
-    return this.canAddReservation() && (this.isAdmin() || this.reservationsRoundsService.currentRound()?.allowDailyReservations || false);
+    return this.canAddReservation() && (this.actingAsAdmin() || this.reservationsRoundsService.currentRound()?.allowDailyReservations || false);
   }
 
   canEditReservation(reservation: WeekReservation): boolean {
-    if (this.isAdmin()) {
+    if (this.actingAsAdmin()) {
       return true;
     }
     return reservation.bookerId === this._currentBooker()?.id;
   }
 
   canEditUnit(): boolean {
-    return this.isAdmin();
+    return this.actingAsAdmin();
   }
 
   blockedDaysFor(reservations: WeekReservation[], reservation?: WeekReservation) {
@@ -357,7 +356,7 @@ export class WeekTableComponent {
     const weekEndDate = week.endDate;
     const unitPricing = this._unitPricing[unit.id] || [];
     const bookers = this.availableBookers();
-    const allowDailyReservations = this.isAdmin() || this.reservationsRoundsService.currentRound()?.allowDailyReservations || false;
+    const allowDailyReservations = this.actingAsAdmin() || this.reservationsRoundsService.currentRound()?.allowDailyReservations || false;
 
     const blockedDates = this.blockedDaysFor(week.reservations[unit.id], reservation)
 
