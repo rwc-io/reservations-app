@@ -247,10 +247,25 @@ export class WeekTableComponent {
 
   addReservation(weekRow: WeekRow, unit: BookableUnit, startDate: DateTime, endDate: DateTime) {
     const unitPricing = this._unitPricing[unit.id] || [];
-    const allowDailyReservations = this.actingAsAdmin() || this.reservationsRoundsService.currentRound()?.allowDailyReservations || false;
-    const blockedDates = this.blockedDaysFor(weekRow.reservations[unit.id])
 
-    const dialogRef = this.dialog.open(ReserveDialog, {
+    const dialogRef = this.openReserveDialog(unit, weekRow, startDate, endDate);
+
+    dialogRef.componentInstance.reservation.subscribe((reservation: Reservation) => {
+      this.submitReservation(reservation);
+      dialogRef.close();
+    });
+  }
+
+  private openReserveDialog(unit: BookableUnit, weekRow: WeekRow, startDate: DateTime, endDate: DateTime, existingReservation?: WeekReservation) {
+    const unitPricing = this._unitPricing[unit.id] || [];
+    const allowDailyReservations = this.actingAsAdmin() || this.reservationsRoundsService.currentRound()?.allowDailyReservations || false;
+    const blockedDates = this.blockedDaysFor(weekRow.reservations[unit.id], existingReservation)
+
+    // Always honor the existing reservation being edited
+    startDate = existingReservation ? existingReservation.startDate : startDate;
+    endDate = existingReservation ? existingReservation.endDate : endDate;
+
+    return this.dialog.open(ReserveDialog, {
       data: {
         unit,
         tier: weekRow.pricingTier,
@@ -262,13 +277,11 @@ export class WeekTableComponent {
         bookers: this.availableBookers(),
         allowDailyReservations,
         blockedDates,
+        initialGuestName: existingReservation?.guestName,
+        initialBookerId: existingReservation?.bookerId,
+        existingReservationId: existingReservation?.id,
       } as ReserveDialogData,
       ...ANIMATION_SETTINGS,
-    });
-
-    dialogRef.componentInstance.reservation.subscribe((reservation: Reservation) => {
-      this.submitReservation(reservation);
-      dialogRef.close();
     });
   }
 
@@ -351,33 +364,8 @@ export class WeekTableComponent {
 
   editReservation(reservation: WeekReservation, week: WeekRow) {
     const unit = reservation.unit;
-    const tier = week.pricingTier;
-    const weekStartDate = week.startDate;
-    const weekEndDate = week.endDate;
-    const unitPricing = this._unitPricing[unit.id] || [];
-    const bookers = this.availableBookers();
-    const allowDailyReservations = this.actingAsAdmin() || this.reservationsRoundsService.currentRound()?.allowDailyReservations || false;
 
-    const blockedDates = this.blockedDaysFor(week.reservations[unit.id], reservation)
-
-    const dialogRef = this.dialog.open(ReserveDialog, {
-      data: {
-        unit,
-        tier,
-        weekStartDate,
-        weekEndDate,
-        startDate: reservation.startDate,
-        endDate: reservation.endDate,
-        unitPricing,
-        bookers,
-        initialGuestName: reservation.guestName,
-        initialBookerId: reservation.bookerId,
-        existingReservationId: reservation.id,
-        allowDailyReservations,
-        blockedDates,
-      },
-      ...ANIMATION_SETTINGS,
-    });
+    const dialogRef = this.openReserveDialog(unit, week, reservation.startDate, reservation.endDate, reservation);
 
     dialogRef.componentInstance.reservation.subscribe((reservation: Reservation) => {
       this.submitReservation(reservation);
