@@ -56,15 +56,14 @@ export const setUserPassword = onCall(
       throw new HttpsError("failed-precondition", "Must be admin");
     }
     // Get the list of admins
-    const query = await db.collection("permissions").get();
+    const query = await db.collection("adminUserIds").get();
 
     if (query.docs.length === 0) {
-      throw new HttpsError("internal", "Permissions document not found");
+      throw new HttpsError("internal", "Admin user IDs not found");
     }
-    const permissions = query.docs[0].data();
+    const adminUserIds = query.docs.map((it) => it.id);
 
-    const adminIds = permissions.adminUserIds as string[];
-    if (!adminIds.includes(request.auth.uid)) {
+    if (!adminUserIds.includes(request.auth.uid)) {
       throw new HttpsError("failed-precondition", "Must be admin");
     }
 
