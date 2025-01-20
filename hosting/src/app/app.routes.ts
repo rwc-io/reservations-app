@@ -13,7 +13,7 @@ const isAdminGuard: CanActivateFn = (
   _next: ActivatedRouteSnapshot,
   _state: RouterStateSnapshot) => {
   const dataService = inject(DataService);
-  return dataService.isAdmin();
+  return dataService.isAdmin$;
 }
 
 export const routes: Routes = [

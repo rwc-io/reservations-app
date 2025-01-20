@@ -1,10 +1,9 @@
 import {inject, Injectable, signal, Signal, WritableSignal} from '@angular/core';
-import {BehaviorSubject, catchError, combineLatest, filter, map, Observable, Subscription} from 'rxjs';
+import {BehaviorSubject, catchError, combineLatest, map, Observable, Subscription} from 'rxjs';
 import {
   BookableUnit,
   Booker,
   ConfigData,
-  Permissions,
   PricingTier,
   PricingTierMap,
   ReservableWeek,
@@ -37,13 +36,12 @@ import {ANNUAL_DOCUMENTS_FOLDER, FLOOR_PLANS_FOLDER} from './app.config';
   providedIn: 'root',
 })
 export class DataService {
-  private readonly firestore: Firestore;
+  private readonly firestore: Firestore = inject(Firestore);
   private readonly storage = inject(Storage);
   private readonly auth = inject(Auth);
 
   annualDocumentFilename: WritableSignal<string>;
   bookers: Signal<Booker[]>;
-  permissions$: Observable<Permissions>;
   pricingTiers$: Observable<PricingTierMap>;
   readonly reservationRoundsConfig$;
   readonly reservations$: BehaviorSubject<Reservation[]>;
@@ -53,7 +51,16 @@ export class DataService {
   readonly unitPricing$: BehaviorSubject<UnitPricingMap>;
   weeks$: BehaviorSubject<ReservableWeek[]>;
 
+  private readonly adminUserIds$ = collectionSnapshots(collection(this.firestore, 'adminUserIds')).pipe(
+    map(it => {
+      return it.map(it => it.id)
+    }),
+    catchError((_error, caught) => caught),
+  );
+
+  // Provide signal & observable for convenience
   readonly isAdmin = signal(false)
+  readonly isAdmin$;
 
   readonly floorPlanFilenames: Signal<string[]>;
   readonly annualDocumentFilenames: Signal<string[]>;
@@ -65,35 +72,20 @@ export class DataService {
   availableYears = signal([2025, 2026, 2027]);
 
   constructor(firestore: Firestore, auth: Auth) {
-    this.firestore = firestore;
-
-    this.permissions$ = collectionData(
-      collection(firestore, 'permissions')
-    ).pipe(
-      filter(it => !!it),
-      map(it => it[0] as Permissions),
-      catchError((_error, caught) => caught),
-    ) as Observable<Permissions>;
 
     // No unsubscribe; this is global state anyhow
-    combineLatest([authState(auth), this.permissions$]).pipe(
-      map(([user, permissions]) => {
-        return [user, permissions];
-      }),
-      /*
-      catchError((_error, caught) => {
-        this.currentUser = undefined;
-        this.isAdmin.set(false);
-        return caught;
-      }),
-      */
-    ).subscribe(
-      ([u, p]) => {
+    combineLatest([authState(auth), this.adminUserIds$]).subscribe(([u, a]) => {
+      const user = u as (User | null);
+      const adminUserIds = (a || []) as string[];
+      this.isAdmin.set(!!user && adminUserIds.includes(user.uid));
+    })
+    this.isAdmin$ = combineLatest([authState(auth), this.adminUserIds$]).pipe(
+      map(([u, a]) => {
         const user = u as (User | null);
-        const permissions = p as (Permissions | null);
-        this.isAdmin.set(!!user && !!permissions && permissions.adminUserIds.includes(user.uid));
-      }
-    )
+        const adminUserIds = (a || []) as string[];
+        return !!user && adminUserIds.includes(user.uid);
+      }),
+    );
 
     // Get the pricing tier documents … with the ID field.
     // Also, store as a map from id to pricing tier.
