@@ -59,7 +59,13 @@ jobs:
       - name: Deploy functions
         run: |
           echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}" | base64 --decode > "google-application-credentials.json"
-          firebase deploy --only functions --non-interactive --debug
+          firebase deploy --only functions --non-interactive
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: "google-application-credentials.json"
+      - name: Deploy storage
+        run: |
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}" | base64 --decode > "google-application-credentials.json"
+          firebase deploy --only storage --non-interactive
         env:
           GOOGLE_APPLICATION_CREDENTIALS: "google-application-credentials.json"
       - name: Cleanup credentials
