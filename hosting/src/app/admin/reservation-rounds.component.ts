@@ -26,7 +26,7 @@ import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/m
 import {DateTime} from 'luxon';
 import {RoundConfigComponent} from '../reservations/round-config.component';
 import {ANIMATION_SETTINGS} from '../app.config';
-import {EditRoundDialog} from './edit-round-dialog.component';
+import {EditRoundDialog, EditRoundDialogData} from './edit-round-dialog.component';
 
 @Component({
   selector: 'reservation-rounds-admin',
@@ -105,8 +105,9 @@ export class ReservationRoundsComponent implements OnDestroy {
         durationWeeks: 0,
         bookedWeeksLimit: 0,
         allowDailyReservations: false,
+        allowDeletions: false,
         bookers: this.bookers(),
-      },
+      } as EditRoundDialogData,
       ...ANIMATION_SETTINGS,
     });
     dialogRef.componentInstance.round.subscribe((round: ReservationRoundDefinition) => {
@@ -127,9 +128,10 @@ export class ReservationRoundsComponent implements OnDestroy {
         subRoundBookerIds: round.subRoundBookerIds,
         bookedWeeksLimit: round.bookedWeeksLimit,
         allowDailyReservations: round.allowDailyReservations || false,
+        allowDeletions: round.allowDeletions || false,
         bookers: this.bookers(),
         existingPosition: index,
-      },
+      } as EditRoundDialogData,
       ...ANIMATION_SETTINGS,
     });
     dialogRef.componentInstance.round.subscribe((round: ReservationRoundDefinition) => {

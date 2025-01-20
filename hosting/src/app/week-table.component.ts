@@ -324,10 +324,15 @@ export class WeekTableComponent {
   }
 
   canDeleteReservation(reservation: WeekReservation): boolean {
+    // Admins can always delete
     if (this.actingAsAdmin()) {
       return true;
     }
-    return reservation.bookerId === this._currentBooker()?.id;
+
+    // Allow deletions if the current round allows them, and, the reservation belongs to the current booker
+    const currentRound = this.reservationsRoundsService.currentRound();
+    const subRoundBooker = this.reservationsRoundsService.currentSubRoundBooker();
+    return !!currentRound && currentRound.allowDeletions && reservation.bookerId === this._currentBooker()?.id && (!subRoundBooker || subRoundBooker.id === reservation.bookerId);
   }
 
   canEditUnit(): boolean {
