@@ -13,14 +13,25 @@
       <mat-error>Name is required</mat-error>
     </mat-form-field>
   </div>
-  <p>Allow daily reservations:</p>
+  <p>Daily reservations allowed:</p>
   <div>
     <mat-button-toggle-group
       [(ngModel)]="allowDailyReservations"
       aria-label="Allow daily reservations"
     >
-      <mat-button-toggle [value]="false">Weekly only</mat-button-toggle>
-      <mat-button-toggle [value]="true">Daily possible</mat-button-toggle>
+      <mat-button-toggle [value]="false">No</mat-button-toggle>
+      <mat-button-toggle [value]="true">Yes</mat-button-toggle>
+    </mat-button-toggle-group>
+    <div>&nbsp;</div>
+  </div>
+  <p>Reservations may be deleted:</p>
+  <div>
+    <mat-button-toggle-group
+      [(ngModel)]="allowDeletions"
+      aria-label="Allow deletions"
+    >
+      <mat-button-toggle [value]="false">No</mat-button-toggle>
+      <mat-button-toggle [value]="true">Yes</mat-button-toggle>
     </mat-button-toggle-group>
     <div>&nbsp;</div>
   </div>

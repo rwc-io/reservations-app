@@ -1,8 +1,8 @@
 import {Component, computed, inject, model, OnDestroy, signal, Signal, WritableSignal} from '@angular/core';
 import {AsyncPipe, KeyValuePipe, NgForOf} from '@angular/common';
 import {AuthComponent, authState} from './auth/auth.component';
-import {Auth, User} from '@angular/fire/auth';
-import {catchError, combineLatest, from, map, Observable} from 'rxjs';
+import {Auth} from '@angular/fire/auth';
+import {combineLatest, from, Observable} from 'rxjs';
 import {WeekTableComponent} from './week-table.component';
 import {
   BookableUnit,
@@ -73,15 +73,13 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 })
 export class ReservationsComponent implements OnDestroy {
   private readonly auth = inject(Auth);
-  protected readonly dataService;
+  protected readonly dataService = inject(DataService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly storage = inject(Storage);
   protected readonly reservationRoundsService = inject(ReservationRoundsService);
   private readonly todayService = inject(TodayService);
   user$ = authState(this.auth);
-  private currentUser?: User;
-  private currentPermissions?: Permissions;
 
   today: Signal<DateTime>;
   bookerIdOverride: WritableSignal<string> = signal('');
@@ -101,14 +99,13 @@ export class ReservationsComponent implements OnDestroy {
   pricingTiers$: Observable<{ [key: string]: PricingTier }>;
   unitPricing$: Observable<UnitPricingMap>;
 
-  isAdmin = signal(false);
-  currentUserSubscription;
+  isAdmin = this.dataService.isAdmin;
   bookersSubscription;
 
   currentYear = model(2025);
 
-  constructor(dataService: DataService, reservationRoundsService: ReservationRoundsService) {
-    this.dataService = dataService;
+  constructor(reservationRoundsService: ReservationRoundsService) {
+    const dataService = this.dataService;
     this.annualDocumentFilename = dataService.annualDocumentFilename;
     this.bookers = dataService.bookers;
     this.permissions$ = dataService.permissions$;
@@ -139,27 +136,9 @@ export class ReservationsComponent implements OnDestroy {
     )
 
     this.today = this.todayService.today;
-
-    this.currentUserSubscription = combineLatest([this.user$, this.permissions$]).pipe(
-      map(([user, permissions]) => {
-        return [user, permissions];
-      }),
-      catchError((_error, caught) => {
-        this.currentUser = undefined;
-        this.isAdmin.set(false);
-        return caught;
-      }),
-    ).subscribe(
-      ([user, permissions]) => {
-        this.currentUser = (user as User) || undefined;
-        this.currentPermissions = (permissions as Permissions) || undefined;
-        this.isAdmin.set(!!this.currentUser && !!this.currentPermissions && this.currentPermissions.adminUserIds.includes(this.currentUser.uid));
-      }
-    )
   }
 
   ngOnDestroy() {
-    this.currentUserSubscription?.unsubscribe();
     this.bookersSubscription?.unsubscribe();
   }
 

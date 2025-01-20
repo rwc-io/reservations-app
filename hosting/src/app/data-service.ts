@@ -27,7 +27,7 @@ import {
   updateDoc,
   where
 } from '@angular/fire/firestore';
-import {Auth} from '@angular/fire/auth';
+import {Auth, User} from '@angular/fire/auth';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {authState} from './auth/auth.component';
 import {deleteObject, listAll, ref, Storage, StorageReference, uploadBytes} from '@angular/fire/storage';
@@ -53,6 +53,8 @@ export class DataService {
   readonly unitPricing$: BehaviorSubject<UnitPricingMap>;
   weeks$: BehaviorSubject<ReservableWeek[]>;
 
+  readonly isAdmin = signal(false)
+
   readonly floorPlanFilenames: Signal<string[]>;
   readonly annualDocumentFilenames: Signal<string[]>;
 
@@ -72,6 +74,26 @@ export class DataService {
       map(it => it[0] as Permissions),
       catchError((_error, caught) => caught),
     ) as Observable<Permissions>;
+
+    // No unsubscribe; this is global state anyhow
+    combineLatest([authState(auth), this.permissions$]).pipe(
+      map(([user, permissions]) => {
+        return [user, permissions];
+      }),
+      /*
+      catchError((_error, caught) => {
+        this.currentUser = undefined;
+        this.isAdmin.set(false);
+        return caught;
+      }),
+      */
+    ).subscribe(
+      ([u, p]) => {
+        const user = u as (User | null);
+        const permissions = p as (Permissions | null);
+        this.isAdmin.set(!!user && !!permissions && permissions.adminUserIds.includes(user.uid));
+      }
+    )
 
     // Get the pricing tier documents … with the ID field.
     // Also, store as a map from id to pricing tier.

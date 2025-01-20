@@ -27,7 +27,7 @@ import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-to
 import {MatList, MatListItem} from '@angular/material/list';
 import {MatIcon} from '@angular/material/icon';
 
-export interface ReserveDialogData {
+export interface EditRoundDialogData {
   existingPosition?: number;
   bookers: Booker[];
   name: string;
@@ -35,6 +35,7 @@ export interface ReserveDialogData {
   subRoundBookerIds?: string[];
   bookedWeeksLimit?: number;
   allowDailyReservations: boolean;
+  allowDeletions: boolean;
 }
 
 @Component({
@@ -74,13 +75,14 @@ export class EditRoundDialog {
   readonly subRoundBookerIds: ModelSignal<string[] | undefined> = model(undefined as string[] | undefined);
   readonly bookingLimitWeeks: ModelSignal<number | undefined> = model(undefined as number | undefined);
   readonly allowDailyReservations = model(false);
+  readonly allowDeletions = model(false);
 
   readonly isRoundRobin = model(false);
 
   round = output<ReservationRoundDefinition>();
   deleteRound = output<void>();
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: ReserveDialogData) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: EditRoundDialogData) {
     this.bookers = data.bookers;
     this.existingPosition = data.existingPosition;
     this.name.set(data.name);
@@ -88,6 +90,7 @@ export class EditRoundDialog {
     this.subRoundBookerIds.set(data.subRoundBookerIds);
     this.bookingLimitWeeks.set(data.bookedWeeksLimit || 0);
     this.allowDailyReservations.set(data.allowDailyReservations);
+    this.allowDeletions.set(data.allowDeletions);
 
     this.isRoundRobin.set(!!this.subRoundBookerIds() && this.subRoundBookerIds()!.length > 0);
 
@@ -121,6 +124,7 @@ export class EditRoundDialog {
     const round = {
       name: this.name(),
       allowDailyReservations: this.allowDailyReservations(),
+      allowDeletions: this.allowDeletions(),
       bookedWeeksLimit: this.bookingLimitWeeks(),
     } as ReservationRoundDefinition;
 
