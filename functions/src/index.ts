@@ -6,13 +6,30 @@ import {HttpsError, onCall} from "firebase-functions/v2/https";
 import {initializeApp} from "firebase-admin/app";
 import {getFirestore} from "firebase-admin/firestore";
 import {getAuth} from "firebase-admin/auth";
+import {auth} from "firebase-admin";
 
 initializeApp();
 const db = getFirestore();
 
+async function authToWho(authType: string, authId: string | undefined): Promise<string> {
+  switch(authType) {
+    case "system":
+      return "System";
+    case "app_user":
+      if (!authId) {
+        return "Unknown";
+      }
+
+      const user = await auth().getUser(authId);
+      return user.email || authId || "Unknown";
+    default:
+      return authId || "Unknown";
+  }
+}
+
 export const modifyDocument =
   onDocumentWrittenWithAuthContext("reservations/{reservationId}",
-    (event) => {
+    async (event) => {
       const docId = event.data?.before.id || event.data?.after.id;
       logger.info(`Reservation changed: ${docId}`);
 
@@ -29,11 +46,11 @@ export const modifyDocument =
       }
 
       const {authType, authId} = event;
-      const who = authType === "system" ? "System" : (authId ? authId : "Unknown");
+      const who = await authToWho(authType, authId);
 
       const startDate = ((previousData?.startDate || newData?.startDate || "1900") as string);
 
-      db.collection("reservationsAuditLog").doc().create({
+      await db.collection("reservationsAuditLog").doc().create({
         reservationId: docId,
         changeType: changeType,
         before: event.data?.before.data() || {},
@@ -41,11 +58,8 @@ export const modifyDocument =
         who: who,
         year: Number((startDate.substring(0, 4))),
         timestamp: new Date(),
-      }).then(() => {
-        logger.info("Reservation audit log created");
-      }).catch((error: Error) => {
-        logger.error(`Error creating audit log: ${error}`);
       });
+      logger.info(`Reservation audit log created for action by ${who}`);
     }
   );
 
