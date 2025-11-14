@@ -15,13 +15,14 @@ async function authToWho(authType: string, authId: string | undefined): Promise<
   switch(authType) {
     case "system":
       return "System";
-    case "app_user":
+    case "app_user": {
       if (!authId) {
         return "Unknown";
       }
 
       const user = await auth().getUser(authId);
       return user.email || authId || "Unknown";
+    }
     default:
       return authId || "Unknown";
   }
