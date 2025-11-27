@@ -12,19 +12,15 @@ initializeApp();
 const db = getFirestore();
 
 async function authToWho(authType: string, authId: string | undefined): Promise<string> {
-  switch(authType) {
-    case "system":
-      return "System";
-    case "app_user": {
-      if (!authId) {
-        return "Unknown";
-      }
+  if (!authId) {
+    return "Unknown";
+  }
 
-      const user = await auth().getUser(authId);
-      return user.email || authId || "Unknown";
-    }
-    default:
-      return authId || "Unknown";
+  try {
+    const user = await auth().getUser(authId);
+    return user.email || authId;
+  } catch (error) {
+    return authId;
   }
 }
 
@@ -47,6 +43,7 @@ export const modifyDocument =
       }
 
       const {authType, authId} = event;
+      logger.info(`Getting 'who' for auth ${authType}:${authId}`)
       const who = await authToWho(authType, authId);
 
       const startDate = ((previousData?.startDate || newData?.startDate || "1900") as string);
@@ -60,7 +57,7 @@ export const modifyDocument =
         year: Number((startDate.substring(0, 4))),
         timestamp: new Date(),
       });
-      logger.info(`Reservation audit log created for action by ${who} (${authType} ${authId})`);
+      logger.info(`Reservation audit log created for action by ${who}`);
     }
   );
 
