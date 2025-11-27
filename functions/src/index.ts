@@ -20,6 +20,7 @@ async function authToWho(authType: string, authId: string | undefined): Promise<
     const user = await auth().getUser(authId);
     return user.email || authId;
   } catch (error) {
+    logger.info(`Couldn't get user with id ${authId}: ${error}`);
     return authId;
   }
 }
