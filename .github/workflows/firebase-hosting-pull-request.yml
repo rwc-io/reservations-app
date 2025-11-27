@@ -44,6 +44,7 @@ jobs:
         working-directory: ./functions
         run: |
           npm install
+          npm run lint
           npm run build
       - name: Install Firebase CLI
         run: |
