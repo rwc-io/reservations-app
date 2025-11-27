@@ -60,7 +60,7 @@ export const modifyDocument =
         year: Number((startDate.substring(0, 4))),
         timestamp: new Date(),
       });
-      logger.info(`Reservation audit log created for action by ${who}`);
+      logger.info(`Reservation audit log created for action by ${who} (${authType} ${authId})`);
     }
   );
 
