@@ -8,6 +8,16 @@
   <app-auth/>
 
   <main>
+    <p>
+      <mat-form-field>
+        <mat-label>Viewing year</mat-label>
+        <mat-select [(ngModel)]="currentYear">
+          <mat-option *ngFor="let year of dataService.availableYears()" [value]="year">
+            {{ year }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </p>
     @if (!activeChild()) {
       Select an admin section:
     }
