@@ -93,3 +93,8 @@ export interface UnitPricing {
 
 // Map from unit ID to array of unit pricings (identified by tiers).
 export type UnitPricingMap = { [key: string]: UnitPricing[] };
+
+export interface YearConfig {
+  id: string;
+  year: number;
+}

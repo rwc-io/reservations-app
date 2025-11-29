@@ -1,4 +1,4 @@
-import {Component, computed, inject, model, OnDestroy, signal, Signal, WritableSignal} from '@angular/core';
+import {Component, computed, inject, OnDestroy, signal, Signal, WritableSignal} from '@angular/core';
 import {AsyncPipe, KeyValuePipe} from '@angular/common';
 import {AuthComponent, authState} from './auth/auth.component';
 import {Auth} from '@angular/fire/auth';
@@ -95,8 +95,6 @@ export class ReservationsComponent implements OnDestroy {
   isAdmin = this.dataService.isAdmin;
   bookersSubscription;
 
-  currentYear = model(2025);
-
   constructor(reservationRoundsService: ReservationRoundsService) {
     const dataService = this.dataService;
     this.annualDocumentFilename = dataService.annualDocumentFilename;
@@ -113,10 +111,6 @@ export class ReservationsComponent implements OnDestroy {
       const rootRef = ref(this.storage, ANNUAL_DOCUMENTS_FOLDER);
       return from(getDownloadURL(ref(rootRef, this.annualDocumentFilename())))
     });
-
-    this.currentYear.subscribe(year => {
-      this.dataService.activeYear.next(year);
-    })
 
     this.bookersSubscription = combineLatest([toObservable(dataService.bookers), this.user$, toObservable(this.bookerIdOverride)]).subscribe(
       ([bookers, user, bookerIdOverride]) => {
@@ -146,7 +140,7 @@ export class ReservationsComponent implements OnDestroy {
       ...ANIMATION_SETTINGS,
     });
     dialogRef.componentInstance.outputFilename.subscribe((filename: string) => {
-      this.dataService.updateAnnualDocumentFilename(this.currentYear(), filename).then(() => {
+      this.dataService.updateAnnualDocumentFilename(this.dataService.activeYear(), filename).then(() => {
         this.snackBar.open('Document updated', 'Ok', {
           duration: 3000
         });

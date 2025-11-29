@@ -10,7 +10,7 @@
   }
   <app-auth/>
   @if (user$ | async) {
-    <year-selector [years]="dataService.availableYears()" [(selectedYear)]="currentYear" />
+    <year-selector [years]="dataService.availableYearsSig()" />
     @if (annualDocumentFilename() || isAdmin()) {
       <p>
         @if (annualDocumentFilename()) {
@@ -27,7 +27,7 @@
     }
     <mat-chip-set>
       <mat-chip>
-        Year: {{ currentYear() }}
+        Year: {{ dataService.activeYear() }}
       </mat-chip>
       <mat-chip>
         Current round: {{ reservationRoundsService.currentRound()?.name || 'none' }}

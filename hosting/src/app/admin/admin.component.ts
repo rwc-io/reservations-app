@@ -30,7 +30,6 @@ export class AdminComponent implements OnDestroy {
   title = 'Reservations-App';
 
   activeChild = model('');
-  currentYear = model(2025);
 
   constructor(private router: Router, private route: ActivatedRoute, protected dataService: DataService) {
     // Does it really have to be this way...?
@@ -42,9 +41,6 @@ export class AdminComponent implements OnDestroy {
       switchMap(() => iif(() => this.route.children.length > 0, this.route.children[0]?.url, of(undefined))),
       map(it => !!it ? it[0].path : '')
     ).subscribe(it => this.activeChild.set(it));
-
-    // Keep the global active year in sync with the selector
-    this.currentYear.subscribe(year => this.dataService.activeYear.next(year));
   }
 
   ngOnDestroy() {

@@ -1,4 +1,4 @@
-import {inject, Injectable, signal, Signal, WritableSignal} from '@angular/core';
+import {computed, inject, Injectable, signal, Signal, WritableSignal} from '@angular/core';
 import {BehaviorSubject, catchError, combineLatest, map, Observable, Subscription} from 'rxjs';
 import {
   BookableUnit,
@@ -11,7 +11,8 @@ import {
   ReservationAuditLog,
   ReservationRoundsConfig,
   UnitPricing,
-  UnitPricingMap
+  UnitPricingMap,
+  YearConfig
 } from './types';
 import {
   addDoc,
@@ -27,7 +28,7 @@ import {
   where
 } from '@angular/fire/firestore';
 import {Auth, User} from '@angular/fire/auth';
-import {toSignal} from '@angular/core/rxjs-interop';
+import {toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {authState} from './auth/auth.component';
 import {deleteObject, listAll, ref, Storage, StorageReference, uploadBytes} from '@angular/fire/storage';
 import {ANNUAL_DOCUMENTS_FOLDER, FLOOR_PLANS_FOLDER} from './app.config';
@@ -50,6 +51,9 @@ export class DataService {
   readonly unitPricing$: BehaviorSubject<UnitPricingMap>;
   weeks$: BehaviorSubject<ReservableWeek[]>;
 
+  yearsSig: Signal<YearConfig[]>;
+  availableYearsSig: Signal<number[]>;
+
   private readonly adminUserIds$ = collectionSnapshots(collection(this.firestore, 'adminUserIds')).pipe(
     map(it => {
       return it.map(it => it.id)
@@ -66,12 +70,9 @@ export class DataService {
 
   private readonly reservationsCollection;
 
-  activeYear = new BehaviorSubject(2025);
-  // FIXME: query for years present in weeks collection
-  availableYears = signal([2025, 2026, 2027]);
+  activeYear = signal(new Date().getFullYear());
 
   constructor(firestore: Firestore, auth: Auth) {
-
     // No unsubscribe; this is global state anyhow
     combineLatest([authState(auth), this.adminUserIds$]).subscribe(([u, a]) => {
       const user = u as (User | null);
@@ -85,6 +86,24 @@ export class DataService {
         return !!user && adminUserIds.includes(user.uid);
       }),
     );
+
+    const yearsCollection = collection(firestore, 'years').withConverter<YearConfig>({
+      fromFirestore: snapshot => {
+        const {annualDocumentFilename, year} = snapshot.data();
+        const {id} = snapshot;
+        return {id, annualDocumentFilename, year};
+      },
+      toFirestore: (it: any) => it,
+    });
+    this.yearsSig = toSignal(collectionData(yearsCollection).pipe(
+      catchError((_error, caught) => caught)
+    ), {initialValue: []});
+
+    this.availableYearsSig = computed(() => {
+      const years = this.yearsSig().map(it => it.year);
+      return years.sort((a, b) => a - b);
+    });
+
 
     // Get the pricing tier documents … with the ID field.
     // Also, store as a map from id to pricing tier.
@@ -156,7 +175,7 @@ export class DataService {
 
     // Reset the data when the user changes.
     const a = authState(auth);
-    combineLatest([this.activeYear, a]).subscribe(([year, user]) => {
+    combineLatest([toObservable(this.activeYear), a]).subscribe(([year, user]) => {
       console.info(`Using data for year: ${year}`);
 
       // If the user is not logged in, don't bother fetching data.

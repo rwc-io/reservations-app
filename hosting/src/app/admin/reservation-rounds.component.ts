@@ -85,7 +85,7 @@ export class ReservationRoundsComponent implements OnDestroy {
   }
 
   constructor(private route: ActivatedRoute) {
-    this.year = toSignal(this.dataService.activeYear, {initialValue: 0});
+    this.year = computed(() => this.dataService.activeYear());
     this.roundsSubscription = this.dataService.reservationRoundsConfig$.subscribe(config => {
       this.reservationRoundsConfig.set(config);
       this.roundsStartDate.set(DateTime.fromISO(config.startDate));
