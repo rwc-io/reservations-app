@@ -1,5 +1,8 @@
 import {Component} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
+import {Title} from '@angular/platform-browser';
+
+import reservationsAppConfig from './reservations-app.config.json';
 
 
 @Component({
@@ -11,8 +14,10 @@ import {RouterOutlet} from '@angular/router';
   templateUrl: './app.component.html',
 })
 export class AppComponent {
-  title = 'Reservations-App';
+  constructor(private titleService: Title) {
+  }
 
-  constructor() {
+  ngOnInit() {
+    this.titleService.setTitle(reservationsAppConfig.applicationTitle);
   }
 }

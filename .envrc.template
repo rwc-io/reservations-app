@@ -1,0 +1,8 @@
+export APPLICATION_TITLE="Reservations [dev]"
+
+export FIREBASE_PROJECT_ID=your-project-id
+export FIREBASE_APP_ID="1:123:web:123"
+export FIREBASE_STORAGE_BUCKET=your-project-id.firebasestorage.app
+export FIREBASE_API_KEY=abc123
+export FIREBASE_AUTH_DOMAIN=your-project-id.firebasestorage.com
+export FIREBASE_MESSAGING_SENDER_ID=123456
