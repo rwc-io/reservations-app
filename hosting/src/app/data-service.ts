@@ -38,7 +38,6 @@ import {ANNUAL_DOCUMENTS_FOLDER, FLOOR_PLANS_FOLDER} from './app.config';
 export class DataService {
   private readonly firestore: Firestore = inject(Firestore);
   private readonly storage = inject(Storage);
-  private readonly auth = inject(Auth);
 
   annualDocumentFilename: WritableSignal<string>;
   bookers: Signal<Booker[]>;

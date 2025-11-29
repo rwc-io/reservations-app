@@ -1,5 +1,5 @@
 import {Component, computed, inject, model, OnDestroy, signal, Signal, WritableSignal} from '@angular/core';
-import {AsyncPipe, KeyValuePipe, NgForOf} from '@angular/common';
+import {AsyncPipe, KeyValuePipe} from '@angular/common';
 import {AuthComponent, authState} from './auth/auth.component';
 import {Auth} from '@angular/fire/auth';
 import {combineLatest, from, Observable} from 'rxjs';
@@ -7,7 +7,6 @@ import {WeekTableComponent} from './week-table.component';
 import {
   BookableUnit,
   Booker,
-  Permissions,
   PricingTier,
   ReservableWeek,
   Reservation,
@@ -24,9 +23,7 @@ import {RoundConfigComponent} from './reservations/round-config.component';
 import {BookerPickerComponent} from './utility/booker-picker.component';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {MatChip, MatChipSet} from '@angular/material/chips';
-import {MatFormField, MatOption, MatSelect} from '@angular/material/select';
 import {FormsModule} from '@angular/forms';
-import {MatLabel} from '@angular/material/form-field';
 import {AuditLogComponent} from './reservations/audit-log.component';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {RouterLink} from '@angular/router';
@@ -38,6 +35,7 @@ import {ErrorDialog} from './utility/error-dialog.component';
 import {MatDialog} from '@angular/material/dialog';
 import {EditAnnualDocumentDialog} from './admin/edit-annual-document-dialog.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {YearSelectorComponent} from './utility/year-selector.component';
 
 
 @Component({
@@ -53,12 +51,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
     MatChip,
     KeyValuePipe,
     MatChipSet,
-    MatSelect,
-    MatOption,
-    NgForOf,
-    MatFormField,
     FormsModule,
-    MatLabel,
     AuditLogComponent,
     MatButton,
     RouterLink,
@@ -67,6 +60,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
     MatCard,
     MatIcon,
     MatIconButton,
+    YearSelectorComponent,
   ],
   templateUrl: './reservations.component.html',
   styleUrl: './reservations.component.css',

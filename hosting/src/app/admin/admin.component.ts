@@ -1,5 +1,4 @@
 import {Component, model, OnDestroy} from '@angular/core';
-import {NgForOf} from '@angular/common';
 import {AuthComponent} from '../auth/auth.component';
 import {ActivatedRoute, ActivationEnd, Router, RouterLink, RouterOutlet} from '@angular/router';
 import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-toggle';
@@ -7,10 +6,8 @@ import {distinctUntilChanged, switchMap} from 'rxjs/operators';
 import {filter, iif, map, of} from 'rxjs';
 import {FormsModule} from '@angular/forms';
 import {MatButton} from '@angular/material/button';
-import {MatFormField} from '@angular/material/form-field';
-import {MatOption, MatSelect} from '@angular/material/select';
 import {DataService} from '../data-service';
-import {MatLabel} from '@angular/material/form-field';
+import {YearSelectorComponent} from '../utility/year-selector.component';
 
 
 @Component({
@@ -24,11 +21,7 @@ import {MatLabel} from '@angular/material/form-field';
     FormsModule,
     RouterLink,
     MatButton,
-    MatFormField,
-    MatLabel,
-    MatSelect,
-    MatOption,
-    NgForOf,
+    YearSelectorComponent,
   ],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css',

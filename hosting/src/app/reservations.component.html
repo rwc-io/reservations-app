@@ -10,14 +10,7 @@
   }
   <app-auth/>
   @if (user$ | async) {
-    <mat-form-field>
-      <mat-label>Viewing year</mat-label>
-      <mat-select [(ngModel)]="currentYear">
-        <mat-option *ngFor="let year of dataService.availableYears()" [value]="year">
-          {{ year }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
+    <year-selector [years]="dataService.availableYears()" [(selectedYear)]="currentYear" />
     @if (annualDocumentFilename() || isAdmin()) {
       <p>
         @if (annualDocumentFilename()) {
