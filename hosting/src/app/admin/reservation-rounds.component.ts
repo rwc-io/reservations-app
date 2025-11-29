@@ -15,7 +15,6 @@ import {of, Subscription} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatDialog} from "@angular/material/dialog";
 import {ReservationRound, ReservationRoundDefinition, ReservationRoundsConfig} from '../types';
-import {toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {MatError, MatFormField, MatLabel, MatSuffix} from '@angular/material/form-field';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -29,7 +28,7 @@ import {ANIMATION_SETTINGS} from '../app.config';
 import {EditRoundDialog, EditRoundDialogData} from './edit-round-dialog.component';
 
 @Component({
-  selector: 'reservation-rounds-admin',
+  selector: 'app-reservation-rounds-admin',
   standalone: true,
   imports: [
     MatCard,
@@ -52,6 +51,8 @@ import {EditRoundDialog, EditRoundDialogData} from './edit-round-dialog.componen
   templateUrl: './reservation-rounds.component.html',
 })
 export class ReservationRoundsComponent implements OnDestroy {
+  private route = inject(ActivatedRoute);
+
   private readonly dataService = inject(DataService);
   private readonly dialog = inject(MatDialog);
   private readonly reservationRoundsService = inject(ReservationRoundsService);
@@ -64,7 +65,7 @@ export class ReservationRoundsComponent implements OnDestroy {
   roundsStartDate: ModelSignal<DateTime> = model(DateTime.now());
 
   rounds = computed(() => {
-    if (!!this.reservationRoundsConfig()) {
+    if (this.reservationRoundsConfig()) {
       return of(this.reservationRoundsService.definitionsToRounds(this.reservationRoundsConfig()));
     } else {
       return of([] as ReservationRound[]);
@@ -84,7 +85,7 @@ export class ReservationRoundsComponent implements OnDestroy {
     this.startDateSubscription?.unsubscribe();
   }
 
-  constructor(private route: ActivatedRoute) {
+  constructor() {
     this.year = computed(() => this.dataService.activeYear());
     this.roundsSubscription = this.dataService.reservationRoundsConfig$.subscribe(config => {
       this.reservationRoundsConfig.set(config);

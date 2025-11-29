@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Inject,} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -9,7 +9,7 @@ import {
 import {MatButton} from '@angular/material/button';
 
 @Component({
-  selector: 'error-dialog',
+  selector: 'app-error-dialog',
   templateUrl: 'error-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
@@ -22,6 +22,5 @@ import {MatButton} from '@angular/material/button';
   ]
 })
 export class ErrorDialog {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: string) {
-  }
+  data = inject(MAT_DIALOG_DATA);
 }

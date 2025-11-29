@@ -17,7 +17,7 @@ import {MatButton} from '@angular/material/button';
 import {ErrorDialog} from '../utility/error-dialog.component';
 
 @Component({
-  selector: 'unit-pricing',
+  selector: 'app-unit-pricing',
   standalone: true,
   imports: [
     MatCard,
@@ -37,12 +37,14 @@ import {ErrorDialog} from '../utility/error-dialog.component';
   templateUrl: './unit-pricing.component.html',
 })
 export class UnitPricingComponent implements OnInit, OnDestroy {
+  private route = inject(ActivatedRoute);
+
   private readonly dataService = inject(DataService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly storage = inject(Storage);
 
-  year: Signal<number>
+  year = this.dataService.activeYear
   selectedUnitId = signal('');
   units = this.dataService.units;
   allPricings = toSignal(this.dataService.unitPricing$, {initialValue: {} as UnitPricingMap});
@@ -60,7 +62,7 @@ export class UnitPricingComponent implements OnInit, OnDestroy {
   form: Signal<FormGroup> = computed(() => {
     const unitPricing = this.unitPricing();
 
-    const group: any = {};
+    const group: Record<string, FormControl> = {};
 
     this.tierIds().forEach(tierId => {
       const tieredPrice = unitPricing.find(p => p.tierId === tierId);
@@ -87,10 +89,6 @@ export class UnitPricingComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.paramSubscription?.unsubscribe();
-  }
-
-  constructor(private route: ActivatedRoute) {
-    this.year = toSignal(this.dataService.activeYear, {initialValue: 0});
   }
 
   onSubmit() {

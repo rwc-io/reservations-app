@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, HostListener, inject, Inject, model,} from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, inject, model } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -13,7 +13,7 @@ import {MatInput} from '@angular/material/input';
 import {FormsModule} from '@angular/forms';
 
 @Component({
-  selector: 'password-dialog',
+  selector: 'app-password-dialog',
   templateUrl: 'password-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
@@ -31,6 +31,8 @@ import {FormsModule} from '@angular/forms';
   ]
 })
 export class PasswordDialog {
+  bookerName = inject(MAT_DIALOG_DATA);
+
   readonly dialogRef = inject(MatDialogRef<PasswordDialog>);
   readonly password = model('');
   readonly passwordConfirm = model('');
@@ -38,9 +40,6 @@ export class PasswordDialog {
   @HostListener('window:keyup.Enter', ['$event'])
   onKeyPress(_event: KeyboardEvent): void {
     this.dialogRef.close(this.password())
-  }
-
-  constructor(@Inject(MAT_DIALOG_DATA) public bookerName: string) {
   }
 
   isValid() {

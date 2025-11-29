@@ -30,7 +30,7 @@ export interface PricingTier {
   color: number[];
 }
 
-export type PricingTierMap = { [key: string]: PricingTier };
+export type PricingTierMap = Record<string, PricingTier>;
 
 export interface ReservableWeek {
   startDate: string;
@@ -52,8 +52,8 @@ export interface ReservationAuditLog {
   reservationId: string;
   timestamp: Timestamp;
   changeType: string;
-  before: { [key: string]: any };
-  after: { [key: string]: any };
+  before: Record<string, string | number | Timestamp>;
+  after: Record<string, string | number | Timestamp>;
 }
 
 export interface ReservationRound {
@@ -92,7 +92,7 @@ export interface UnitPricing {
 }
 
 // Map from unit ID to array of unit pricings (identified by tiers).
-export type UnitPricingMap = { [key: string]: UnitPricing[] };
+export type UnitPricingMap = Record<string, UnitPricing[]>;
 
 export interface YearConfig {
   id: string;

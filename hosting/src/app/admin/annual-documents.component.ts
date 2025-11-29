@@ -13,7 +13,7 @@ import {ErrorDialog} from "../utility/error-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 
 @Component({
-  selector: 'annual-documents',
+  selector: 'app-annual-documents',
   standalone: true,
   imports: [
     MatList,
@@ -37,7 +37,7 @@ export class AnnualDocumentsComponent {
   private readonly storage = inject(Storage);
 
   protected readonly annualDocumentFilenames: Signal<string[]> = signal([]);
-  protected readonly annualDocumentDownloadUrls: Signal<{ [key: string]: Observable<string> }> = computed(() => {
+  protected readonly annualDocumentDownloadUrls: Signal<Record<string, Observable<string>>> = computed(() => {
     return this.refreshDownloadUrls();
   });
 
@@ -45,8 +45,8 @@ export class AnnualDocumentsComponent {
     this.annualDocumentFilenames = this.dataService.annualDocumentFilenames;
   }
 
-  refreshDownloadUrls(): { [key: string]: Observable<string> } {
-    const downloadUrls = {} as { [key: string]: Observable<string> };
+  refreshDownloadUrls(): Record<string, Observable<string>> {
+    const downloadUrls = {} as Record<string, Observable<string>>;
     const rootRef = ref(this.storage, ANNUAL_DOCUMENTS_FOLDER);
     this.annualDocumentFilenames().forEach(filename => {
       downloadUrls[filename] = from(getDownloadURL(ref(rootRef, filename)));

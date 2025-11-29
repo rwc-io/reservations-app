@@ -5,46 +5,48 @@
         Reservation history
       </mat-expansion-panel-header>
       <mat-list>
-        <mat-list-item *ngFor="let entry of auditLog()">
-          <mat-icon class="material-icons-outline" matListItemIcon>{{ changeIcon(entry) }}</mat-icon>
-          <span matListItemTitle>{{ changeType(entry) }}</span>
-          <span matListItemLine>{{ entry.who }} at {{ entry.timestamp | shortDateTime }}</span>
-          <span>Reserving
-            @if (unitBefore(entry) !== unitAfter(entry)) {
-              <s>{{ unitBefore(entry)?.name }}</s>
-              <span>{{ unitAfter(entry)?.name }}</span>
-            } @else {
-              <span>{{ unitAfter(entry)?.name }}</span>
-            }
-            from
-            @if (startDateChanged(entry) || endDateChanged(entry)) {
-              @if (startDateBefore(entry) && endDateBefore(entry)) {
-                <s>{{ startDateBefore(entry) | shortDate }} to {{ endDateBefore(entry) | shortDate }}</s>
+        @for (entry of auditLog(); track entry) {
+          <mat-list-item>
+            <mat-icon class="material-icons-outline" matListItemIcon>{{ changeIcon(entry) }}</mat-icon>
+            <span matListItemTitle>{{ changeType(entry) }}</span>
+            <span matListItemLine>{{ entry.who }} at {{ entry.timestamp | shortDateTime }}</span>
+            <span>Reserving
+              @if (unitBefore(entry) !== unitAfter(entry)) {
+                <s>{{ unitBefore(entry)?.name }}</s>
+                <span>{{ unitAfter(entry)?.name }}</span>
+              } @else {
+                <span>{{ unitAfter(entry)?.name }}</span>
               }
-              @if (startDateAfter(entry) && endDateAfter(entry)) {
-                <span> {{ startDateAfter(entry) | shortDate }} to {{ endDateAfter(entry) | shortDate }}</span>
+              from
+              @if (startDateChanged(entry) || endDateChanged(entry)) {
+                @if (startDateBefore(entry) && endDateBefore(entry)) {
+                  <s>{{ startDateBefore(entry) | shortDate }} to {{ endDateBefore(entry) | shortDate }}</s>
+                }
+                @if (startDateAfter(entry) && endDateAfter(entry)) {
+                  <span> {{ startDateAfter(entry) | shortDate }} to {{ endDateAfter(entry) | shortDate }}</span>
+                }
+              } @else {
+                @if (startDateBefore(entry) && endDateBefore(entry)) {
+                  <span>{{ startDateBefore(entry) | shortDate }} to {{ endDateBefore(entry) | shortDate }}</span>
+                } @else if (startDateAfter(entry) && endDateAfter(entry)) {
+                  <span>{{ startDateAfter(entry) | shortDate }} to {{ endDateAfter(entry) | shortDate }}</span>
+                }
               }
-            } @else {
-              @if (startDateBefore(entry) && endDateBefore(entry)) {
-                <span>{{ startDateBefore(entry) | shortDate }} to {{ endDateBefore(entry) | shortDate }}</span>
-              } @else if (startDateAfter(entry) && endDateAfter(entry)) {
-                <span>{{ startDateAfter(entry) | shortDate }} to {{ endDateAfter(entry) | shortDate }}</span>
+              for
+              @if (guestBefore(entry) !== guestAfter(entry)) {
+                <s>{{ guestBefore(entry) }}</s>
+                <span> {{ guestAfter(entry) }}</span>
+              } @else {
+                <span>{{ guestAfter(entry) }}</span>
               }
-            }
-            for
-            @if (guestBefore(entry) !== guestAfter(entry)) {
-              <s>{{ guestBefore(entry) }}</s>
-              <span> {{ guestAfter(entry) }}</span>
-            } @else {
-              <span>{{ guestAfter(entry) }}</span>
-            }
-            @if (bookerBefore(entry) !== bookerAfter(entry)) {
-              (<s>{{ bookerBefore(entry)?.name }}</s>{{ bookerAfter(entry)?.name }})
-            } @else {
-              (<span>{{ bookerAfter(entry)?.name }}</span>)
-            }
+              @if (bookerBefore(entry) !== bookerAfter(entry)) {
+                (<s>{{ bookerBefore(entry)?.name }}</s>{{ bookerAfter(entry)?.name }})
+              } @else {
+                (<span>{{ bookerAfter(entry)?.name }}</span>)
+              }
           </span>
-        </mat-list-item>
+          </mat-list-item>
+        }
       </mat-list>
     </mat-expansion-panel>
   </mat-accordion>

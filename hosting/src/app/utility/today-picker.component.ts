@@ -7,7 +7,7 @@ import {MatInput} from '@angular/material/input';
 import {TodayService} from './today-service';
 
 @Component({
-  selector: 'today-picker',
+  selector: 'app-today-picker',
   templateUrl: 'today-picker.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,

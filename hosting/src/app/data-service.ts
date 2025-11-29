@@ -46,7 +46,7 @@ export class DataService {
   readonly reservationRoundsConfig$;
   readonly reservations$: BehaviorSubject<Reservation[]>;
   readonly reservationsAuditLog$: BehaviorSubject<ReservationAuditLog[]>;
-  reservationWeekCounts$: Observable<{ [key: string]: number }>;
+  reservationWeekCounts$: Observable<Record<string, number>>;
   units: Signal<BookableUnit[]>;
   readonly unitPricing$: BehaviorSubject<UnitPricingMap>;
   weeks$: BehaviorSubject<ReservableWeek[]>;
@@ -72,7 +72,10 @@ export class DataService {
 
   activeYear = signal(new Date().getFullYear());
 
-  constructor(firestore: Firestore, auth: Auth) {
+  constructor() {
+    const firestore = inject(Firestore);
+    const auth = inject(Auth);
+
     // No unsubscribe; this is global state anyhow
     combineLatest([authState(auth), this.adminUserIds$]).subscribe(([u, a]) => {
       const user = u as (User | null);
@@ -93,7 +96,7 @@ export class DataService {
         const {id} = snapshot;
         return {id, annualDocumentFilename, year};
       },
-      toFirestore: (it: any) => it,
+      toFirestore: (it: never) => it,
     });
     this.yearsSig = toSignal(collectionData(yearsCollection).pipe(
       catchError((_error, caught) => caught)
@@ -113,7 +116,7 @@ export class DataService {
         const {id} = snapshot;
         return {id, name, color};
       },
-      toFirestore: (it: any) => it,
+      toFirestore: (it: never) => it,
     });
     this.pricingTiers$ = collectionData(pricingTiersCollection).pipe(
       map(
@@ -121,7 +124,7 @@ export class DataService {
           return it.reduce((acc, tier) => {
             acc[tier.id] = tier;
             return acc;
-          }, {} as { [key: string]: PricingTier });
+          }, {} as Record<string, PricingTier>);
         }
       )
     );
@@ -133,7 +136,7 @@ export class DataService {
         const {id} = snapshot;
         return {id, year, tierId, unitId, weeklyPrice, dailyPrice};
       },
-      toFirestore: (it: any) => it,
+      toFirestore: (it: never) => it,
     });
     const weeksCollection = collection(firestore, 'weeks');
     const reservationRoundsCollection = collection(firestore, 'reservationRounds').withConverter<ReservationRoundsConfig>({
@@ -143,7 +146,7 @@ export class DataService {
         const {id} = snapshot;
         return {id, rounds, startDate, year};
       },
-      toFirestore: (it: any) => it,
+      toFirestore: (it: never) => it,
     });
     const reservationsAuditLogCollection = collection(firestore, 'reservationsAuditLog');
     this.reservationsCollection = collection(firestore, 'reservations').withConverter<Reservation>({
@@ -152,7 +155,7 @@ export class DataService {
         const {id} = snapshot;
         return {id, startDate, endDate, unitId, guestName, bookerId};
       },
-      toFirestore: (it: any) => it,
+      toFirestore: (it: never) => it,
     });
 
     this.reservationRoundsConfig$ = new BehaviorSubject({
@@ -244,7 +247,7 @@ export class DataService {
         const {id} = snapshot;
         return {id, name, userId};
       },
-      toFirestore: (it: any) => it,
+      toFirestore: (it: never) => it,
     });
     this.bookers = toSignal(collectionData(bookersCollection).pipe(
       catchError((_error, caught) => caught)
@@ -257,7 +260,7 @@ export class DataService {
         const {id} = snapshot;
         return {id, name, floorPlanFilename, notesMarkdown};
       },
-      toFirestore: (it: any) => it,
+      toFirestore: (it: never) => it,
     });
     this.units = toSignal(collectionData(bookableUnitsCollection).pipe(
       catchError((_error, caught) => caught)
@@ -356,7 +359,7 @@ export class DataService {
     return Promise.all(promises);
   }
 
-  private reservationsToMap(reservations: Reservation[]): { [key: string]: number } {
+  private reservationsToMap(reservations: Reservation[]): Record<string, number> {
     return reservations.reduce((acc, reservation) => {
       const key = reservation.bookerId;
       if (!acc[key]) {
@@ -364,7 +367,7 @@ export class DataService {
       }
       acc[key]++;
       return acc;
-    }, {} as { [key: string]: number });
+    }, {} as Record<string, number>);
   }
 
   private unitPricingsToMap(unitPricings: UnitPricing[]): UnitPricingMap {

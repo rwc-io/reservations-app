@@ -11,7 +11,6 @@ import {
 import {DateTime} from 'luxon';
 import {BookableUnit, Booker, ReservationAuditLog} from '../types';
 import {Observable, Subscription} from 'rxjs';
-import {NgForOf} from '@angular/common';
 import {MatList, MatListItem, MatListItemIcon, MatListItemLine, MatListItemTitle} from '@angular/material/list';
 import {ShortDate} from '../utility/short-date.pipe';
 import {MatIcon} from '@angular/material/icon';
@@ -19,12 +18,11 @@ import {ShortDateTime} from '../utility/short-datetime.pipe';
 import {MatAccordion, MatExpansionPanel, MatExpansionPanelHeader} from '@angular/material/expansion';
 
 @Component({
-  selector: 'audit-log',
+  selector: 'app-audit-log',
   templateUrl: 'audit-log.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
-    NgForOf,
     MatList,
     MatListItem,
     MatListItemIcon,
@@ -101,7 +99,7 @@ export class AuditLogComponent implements OnDestroy {
 
   startDateBefore(entry: ReservationAuditLog) {
     if (entry.before['startDate']) {
-      return DateTime.fromISO(entry.before['startDate']);
+      return DateTime.fromISO(entry.before['startDate'] as string);
     } else {
       return undefined;
     }
@@ -109,7 +107,7 @@ export class AuditLogComponent implements OnDestroy {
 
   startDateAfter(entry: ReservationAuditLog) {
     if (entry.after['startDate']) {
-      return DateTime.fromISO(entry.after['startDate']);
+      return DateTime.fromISO(entry.after['startDate'] as string);
     } else {
       return undefined;
     }
@@ -121,7 +119,7 @@ export class AuditLogComponent implements OnDestroy {
 
   endDateBefore(entry: ReservationAuditLog) {
     if (entry.before['endDate']) {
-      return DateTime.fromISO(entry.before['endDate']);
+      return DateTime.fromISO(entry.before['endDate'] as string);
     } else {
       return undefined;
     }
@@ -129,7 +127,7 @@ export class AuditLogComponent implements OnDestroy {
 
   endDateAfter(entry: ReservationAuditLog) {
     if (entry.after['endDate']) {
-      return DateTime.fromISO(entry.after['endDate']);
+      return DateTime.fromISO(entry.after['endDate'] as string);
     } else {
       return undefined;
     }
@@ -151,42 +149,11 @@ export class AuditLogComponent implements OnDestroy {
     return this.bookers().find(booker => booker.id === entry.after['bookerId']);
   }
 
-  unitFor(entry: ReservationAuditLog) {
-    const unitId = entry.before['unitId'] || entry.after['unitId'];
-    return this.units().find(unit => unit.id === unitId);
-  }
-
   startDate(entry: ReservationAuditLog) {
-    return DateTime.fromISO(entry.before['startDate'] || entry.after['startDate']);
+    return DateTime.fromISO((entry.before['startDate'] || entry.after['startDate']) as string);
   }
 
   endDate(entry: ReservationAuditLog) {
-    return DateTime.fromISO(entry.before['endDate'] || entry.after['endDate']);
+    return DateTime.fromISO((entry.before['endDate'] || entry.after['endDate']) as string);
   }
-
-  guestFor(entry: ReservationAuditLog) {
-    return entry.before['guestName'] || entry.after['guestName'];
-  }
-
-  bookerFor(entry: ReservationAuditLog) {
-    const bookerId = entry.before['bookerId'] || entry.after['bookerId'];
-    return this.bookers().find(booker => booker.id === bookerId);
-  }
-
-  changes(entry: ReservationAuditLog) {
-    const changes = [];
-    for (const key in entry.before) {
-      if (entry.before[key] !== entry.after[key]) {
-        changes.push({key, before: entry.before[key], after: entry.after[key]});
-      }
-    }
-    for (const key in entry.after) {
-      if (entry.before[key] !== entry.after[key] && entry.before[key] === undefined) {
-        changes.push({key, before: entry.before[key], after: entry.after[key]});
-      }
-    }
-    return changes;
-  }
-
-
 }

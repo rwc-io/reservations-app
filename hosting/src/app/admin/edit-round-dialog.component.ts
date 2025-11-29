@@ -1,13 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  HostListener,
-  Inject,
-  inject,
-  model,
-  ModelSignal,
-  output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, inject, model, ModelSignal, output } from '@angular/core';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
@@ -39,7 +30,7 @@ export interface EditRoundDialogData {
 }
 
 @Component({
-  selector: 'edit-round-dialog',
+  selector: 'app-edit-round-dialog',
   templateUrl: 'edit-round-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
@@ -66,6 +57,8 @@ export interface EditRoundDialogData {
   ]
 })
 export class EditRoundDialog {
+  data = inject<EditRoundDialogData>(MAT_DIALOG_DATA);
+
   readonly dialogRef = inject(MatDialogRef<EditRoundDialog>);
 
   readonly bookers: Booker[];
@@ -82,7 +75,9 @@ export class EditRoundDialog {
   round = output<ReservationRoundDefinition>();
   deleteRound = output<void>();
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: EditRoundDialogData) {
+  constructor() {
+    const data = this.data;
+
     this.bookers = data.bookers;
     this.existingPosition = data.existingPosition;
     this.name.set(data.name);

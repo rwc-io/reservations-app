@@ -10,6 +10,8 @@ import {TodayService} from '../utility/today-service';
   providedIn: 'root',
 })
 export class ReservationRoundsService implements OnDestroy {
+  private readonly dataService = inject(DataService);
+
   private readonly todayService = inject(TodayService);
   private readonly today = this.todayService.today;
 
@@ -22,7 +24,7 @@ export class ReservationRoundsService implements OnDestroy {
   currentRoundSubscription;
   currentSubRoundBookerSubscription;
 
-  constructor(private readonly dataService: DataService) {
+  constructor() {
     this.reservationRoundsConfig$ = this.dataService.reservationRoundsConfig$;
     this.reservationRounds$ = this.reservationRoundsConfig$.pipe(
       map(config => this.definitionsToRounds(config)),

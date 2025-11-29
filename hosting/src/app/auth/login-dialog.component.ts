@@ -12,7 +12,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 
 @Component({
-  selector: 'login-dialog',
+  selector: 'app-login-dialog',
   templateUrl: 'login-dialog.component.html',
   imports: [FormsModule, MatButtonModule, MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent, MatFormFieldModule, MatInputModule],
   changeDetection: ChangeDetectionStrategy.OnPush,

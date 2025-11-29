@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, HostListener, Inject, inject, model, output,} from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, inject, model, output } from '@angular/core';
 import {MatButton} from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
@@ -26,7 +26,7 @@ export interface EditUnitDialogData {
 }
 
 @Component({
-  selector: 'edit-unit-dialog',
+  selector: 'app-edit-unit-dialog',
   templateUrl: 'edit-unit-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
@@ -47,6 +47,8 @@ export interface EditUnitDialogData {
   ]
 })
 export class EditUnitDialog {
+  data = inject<EditUnitDialogData>(MAT_DIALOG_DATA);
+
   readonly dialogRef = inject(MatDialogRef<EditUnitDialog>);
 
   unitName = model('')
@@ -61,7 +63,9 @@ export class EditUnitDialog {
 
   floorPlanFilenames = inject(DataService).floorPlanFilenames;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: EditUnitDialogData) {
+  constructor() {
+    const data = this.data;
+
     this.unitPricing = data.unitPricing;
     this.unitName.set(data.unitName);
     this.notesMarkdown.set(data.notesMarkdown);

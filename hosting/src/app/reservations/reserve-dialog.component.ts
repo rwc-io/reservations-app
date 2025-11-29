@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, HostListener, Inject, inject, model, output,} from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, inject, model, output } from '@angular/core';
 import {MatButton} from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
@@ -43,7 +43,7 @@ export interface ReserveDialogData {
 }
 
 @Component({
-  selector: 'reserve-dialog',
+  selector: 'app-reserve-dialog',
   templateUrl: 'reserve-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
@@ -72,6 +72,8 @@ export interface ReserveDialogData {
   ]
 })
 export class ReserveDialog {
+  data = inject<ReserveDialogData>(MAT_DIALOG_DATA);
+
   readonly dialogRef = inject(MatDialogRef<ReserveDialog>);
 
   weekStartDate: DateTime;
@@ -88,14 +90,16 @@ export class ReserveDialog {
   readonly unit: BookableUnit;
   readonly tier: PricingTier;
   readonly unitPricing: UnitPricing[];
-  readonly blockedDates: Set<string> = new Set();
+  readonly blockedDates = new Set<string>();
   readonly isDateAvailable = this.isDateAvailableBuilder();
   protected readonly canDelete;
 
   reservation = output<Reservation>();
   deleteReservation = output<void>();
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: ReserveDialogData) {
+  constructor() {
+    const data = this.data;
+
     this.unit = data.unit;
     this.tier = data.tier;
     this.unitPricing = data.unitPricing;
@@ -152,10 +156,10 @@ export class ReserveDialog {
   }
 
   isDateAvailableBuilder() {
-    const _this = this;
+    const blockedDates = this.blockedDates;
 
     return (date: DateTime | null) => {
-      return !!date && !_this.blockedDates.has(date.toISODate()!);
+      return !!date && !blockedDates.has(date.toISODate()!);
     }
   }
 

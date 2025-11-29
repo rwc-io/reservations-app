@@ -39,7 +39,7 @@ import {YearSelectorComponent} from './utility/year-selector.component';
 
 
 @Component({
-  selector: 'reservations',
+  selector: 'app-reservations',
   standalone: true,
   imports: [
     AsyncPipe,
@@ -89,13 +89,15 @@ export class ReservationsComponent implements OnDestroy {
   reservations$: Observable<Reservation[]>;
   reservationsAuditLog$: Observable<ReservationAuditLog[]>;
   units: Signal<BookableUnit[]>;
-  pricingTiers$: Observable<{ [key: string]: PricingTier }>;
+  pricingTiers$: Observable<Record<string, PricingTier>>;
   unitPricing$: Observable<UnitPricingMap>;
 
   isAdmin = this.dataService.isAdmin;
   bookersSubscription;
 
-  constructor(reservationRoundsService: ReservationRoundsService) {
+  constructor() {
+    const reservationRoundsService = inject(ReservationRoundsService);
+
     const dataService = this.dataService;
     this.annualDocumentFilename = dataService.annualDocumentFilename;
     this.bookers = dataService.bookers;
@@ -114,7 +116,7 @@ export class ReservationsComponent implements OnDestroy {
 
     this.bookersSubscription = combineLatest([toObservable(dataService.bookers), this.user$, toObservable(this.bookerIdOverride)]).subscribe(
       ([bookers, user, bookerIdOverride]) => {
-        this.currentBooker.set(!!bookerIdOverride ?
+        this.currentBooker.set(bookerIdOverride ?
           bookers.find(booker => booker.id === bookerIdOverride) :
           bookers.find(booker => booker.userId === user?.uid)
         )
