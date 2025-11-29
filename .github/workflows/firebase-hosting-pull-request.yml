@@ -39,6 +39,7 @@ jobs:
         working-directory: ./hosting
         run: |
           npm install
+          npm run lint
           npm run build
       - name: Build functions
         working-directory: ./functions

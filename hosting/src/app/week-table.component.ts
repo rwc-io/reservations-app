@@ -21,7 +21,6 @@ import {from, Observable, of} from 'rxjs';
 import {
   BookableUnit,
   Booker,
-  Permissions,
   PricingTier,
   PricingTierMap,
   ReservableWeek,
@@ -51,7 +50,7 @@ interface WeekRow {
   startDate: DateTime;
   endDate: DateTime;
   pricingTier: PricingTier;
-  reservations: { [key: string]: WeekReservation[] };
+  reservations: Record<string, WeekReservation[]>;
 }
 
 interface WeekReservation {
@@ -64,7 +63,7 @@ interface WeekReservation {
 }
 
 @Component({
-  selector: 'week-table',
+  selector: 'app-week-table',
   standalone: true,
   imports: [
     MatTable,
@@ -118,7 +117,7 @@ export class WeekTableComponent {
   private _unitPricing: UnitPricingMap = {};
 
   // Download URLs are generated asynchronously
-  protected downloadUrls: { [key: string]: Observable<string> } = {};
+  protected downloadUrls: Record<string, Observable<string>> = {};
 
   // Main table fields
   tableRows$: Observable<WeekRow[]> = of([])
@@ -153,7 +152,7 @@ export class WeekTableComponent {
           } as WeekReservation;
         });
 
-        const reservationsByUnit = weekReservations.reduce((acc: { [key: string]: WeekReservation[] }, reservation) => {
+        const reservationsByUnit = weekReservations.reduce((acc: Record<string, WeekReservation[]>, reservation) => {
           const key = reservation.unit?.id;
           if (!acc[key]) {
             acc[key] = [];
@@ -190,7 +189,7 @@ export class WeekTableComponent {
         acc[unit.id] = from(getDownloadURL(ref(rootRef, unit.floorPlanFilename)))
       }
       return acc;
-    }, {} as { [key: string]: Observable<string> });
+    }, {} as Record<string, Observable<string>>);
 
     this.buildTableRows();
   }
@@ -239,8 +238,6 @@ export class WeekTableComponent {
   }
 
   addReservation(weekRow: WeekRow, unit: BookableUnit, startDate: DateTime, endDate: DateTime) {
-    const unitPricing = this._unitPricing[unit.id] || [];
-
     const dialogRef = this.openReserveDialog(unit, weekRow, startDate, endDate);
 
     dialogRef.componentInstance.reservation.subscribe((reservation: Reservation) => {
@@ -385,7 +382,7 @@ export class WeekTableComponent {
   }
 
   submitReservation(reservation: Reservation) {
-    let errors: string[] = [];
+    const errors: string[] = [];
 
     if (!reservation.guestName) {
       errors.push("Guest name is required.");
@@ -407,7 +404,7 @@ export class WeekTableComponent {
     }
 
     const promise =
-      !!reservation.id ?
+      reservation.id ?
         this.dataService.updateReservation(reservation) :
         this.dataService.addReservation(reservation);
 

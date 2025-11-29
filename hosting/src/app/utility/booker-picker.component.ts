@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
-  Component, computed,
+  Component,
+  computed,
   Input,
   model,
   OnDestroy,
@@ -8,7 +9,6 @@ import {
   OutputRefSubscription,
   Signal,
   signal,
-  WritableSignal,
 } from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
@@ -17,7 +17,7 @@ import {NgForOf} from '@angular/common';
 import {MatOption, MatSelect} from '@angular/material/select';
 
 @Component({
-  selector: 'booker-picker',
+  selector: 'app-booker-picker',
   templateUrl: 'booker-picker.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
@@ -37,7 +37,7 @@ export class BookerPickerComponent implements OnDestroy {
   bookers: Signal<Booker[]> = signal([]);
 
   sortedBookers = computed(() => {
-      return this.bookers().sort((a, b) => a.name.localeCompare(b.name));
+    return this.bookers().sort((a, b) => a.name.localeCompare(b.name));
   });
 
   bookerSubscription?: OutputRefSubscription;

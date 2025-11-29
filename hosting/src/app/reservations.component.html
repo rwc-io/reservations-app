@@ -2,22 +2,15 @@
   <h1>{{ title }}</h1>
   <p>Today is: {{ today().toISODate() }}</p>
   @if (isAdmin()) {
-    <today-picker [today]="today()"></today-picker>
-    <booker-picker (bookerId)="bookerIdOverride.set($event)" [bookers]="bookers"></booker-picker>
+    <app-today-picker [today]="today()"></app-today-picker>
+    <app-booker-picker (bookerId)="bookerIdOverride.set($event)" [bookers]="bookers"></app-booker-picker>
     <button mat-button class="secondary-button" routerLink="/admin">
       Admin panel
     </button>
   }
   <app-auth/>
   @if (user$ | async) {
-    <mat-form-field>
-      <mat-label>Viewing year</mat-label>
-      <mat-select [(ngModel)]="currentYear">
-        <mat-option *ngFor="let year of dataService.availableYears()" [value]="year">
-          {{ year }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
+    <app-year-selector/>
     @if (annualDocumentFilename() || isAdmin()) {
       <p>
         @if (annualDocumentFilename()) {
@@ -34,7 +27,7 @@
     }
     <mat-chip-set>
       <mat-chip>
-        Year: {{ currentYear() }}
+        Year: {{ dataService.activeYear() }}
       </mat-chip>
       <mat-chip>
         Current round: {{ reservationRoundsService.currentRound()?.name || 'none' }}
@@ -48,7 +41,7 @@
         </mat-chip>
       }
     </mat-chip-set>
-    <week-table
+    <app-week-table
       [bookers]="bookers()"
       [currentBooker]="currentBooker()"
       [weeks]="(weeks$ | async) || []"
@@ -62,7 +55,7 @@
         <h1>Reservation Rounds</h1>
       </mat-card-header>
       <mat-card-content>
-        <round-config [rounds$]="reservationRounds$" [bookers]="bookers"/>
+        <app-round-config [rounds$]="reservationRounds$" [bookers]="bookers"/>
         @if (isAdmin()) {
           <button mat-button class="secondary-button" routerLink="/admin/reservation-rounds">
             Manage rounds
@@ -71,7 +64,7 @@
       </mat-card-content>
     </mat-card>
     @if (isAdmin()) {
-      <audit-log [reservationsAuditLog$]="reservationsAuditLog$" [bookers]="bookers" [units]="units"/>
+      <app-audit-log [reservationsAuditLog$]="reservationsAuditLog$" [bookers]="bookers" [units]="units"/>
     }
   } @else {
     <p>

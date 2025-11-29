@@ -13,7 +13,7 @@ import {Functions, httpsCallable} from '@angular/fire/functions';
 import {Auth, updatePassword} from '@angular/fire/auth';
 
 @Component({
-  selector: 'passwords',
+  selector: 'app-passwords',
   standalone: true,
   imports: [
     MatCard,
@@ -32,9 +32,6 @@ export class PasswordsComponent {
   private readonly snackBar = inject(MatSnackBar);
 
   protected readonly bookers = this.dataService.bookers;
-
-  constructor() {
-  }
 
   editPassword(booker?: Booker) {
     const userId = booker?.userId || this.auth.currentUser?.uid;
@@ -59,7 +56,7 @@ export class PasswordsComponent {
       if (!booker) {
         // Changing an admin's password happens through the client (logged in as admin)
 
-        updatePassword(this.auth.currentUser!!, result).then(() => {
+        updatePassword(this.auth.currentUser!, result).then(() => {
           this.snackBar.open('Password updated successfully', 'Ok', {duration: 3000});
         }).catch((error) => {
           this.dialog.open(ErrorDialog, {

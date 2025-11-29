@@ -21,8 +21,8 @@
         </mat-list-item>
       }
     </mat-list>
-    <div (click)="uploadFile.click()">
-      <button mat-fab extended class="primary-button">
+    <div>
+      <button mat-fab extended class="primary-button" (click)="uploadFile.click()" (keydown.enter)="uploadFile.click()">
         <mat-icon>upload</mat-icon>
         Upload
       </button>

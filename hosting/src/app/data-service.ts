@@ -1,4 +1,4 @@
-import {inject, Injectable, signal, Signal, WritableSignal} from '@angular/core';
+import {computed, inject, Injectable, signal, Signal, WritableSignal} from '@angular/core';
 import {BehaviorSubject, catchError, combineLatest, map, Observable, Subscription} from 'rxjs';
 import {
   BookableUnit,
@@ -11,7 +11,8 @@ import {
   ReservationAuditLog,
   ReservationRoundsConfig,
   UnitPricing,
-  UnitPricingMap
+  UnitPricingMap,
+  YearConfig
 } from './types';
 import {
   addDoc,
@@ -27,7 +28,7 @@ import {
   where
 } from '@angular/fire/firestore';
 import {Auth, User} from '@angular/fire/auth';
-import {toSignal} from '@angular/core/rxjs-interop';
+import {toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {authState} from './auth/auth.component';
 import {deleteObject, listAll, ref, Storage, StorageReference, uploadBytes} from '@angular/fire/storage';
 import {ANNUAL_DOCUMENTS_FOLDER, FLOOR_PLANS_FOLDER} from './app.config';
@@ -38,7 +39,6 @@ import {ANNUAL_DOCUMENTS_FOLDER, FLOOR_PLANS_FOLDER} from './app.config';
 export class DataService {
   private readonly firestore: Firestore = inject(Firestore);
   private readonly storage = inject(Storage);
-  private readonly auth = inject(Auth);
 
   annualDocumentFilename: WritableSignal<string>;
   bookers: Signal<Booker[]>;
@@ -46,10 +46,13 @@ export class DataService {
   readonly reservationRoundsConfig$;
   readonly reservations$: BehaviorSubject<Reservation[]>;
   readonly reservationsAuditLog$: BehaviorSubject<ReservationAuditLog[]>;
-  reservationWeekCounts$: Observable<{ [key: string]: number }>;
+  reservationWeekCounts$: Observable<Record<string, number>>;
   units: Signal<BookableUnit[]>;
   readonly unitPricing$: BehaviorSubject<UnitPricingMap>;
   weeks$: BehaviorSubject<ReservableWeek[]>;
+
+  yearsSig: Signal<YearConfig[]>;
+  availableYearsSig: Signal<number[]>;
 
   private readonly adminUserIds$ = collectionSnapshots(collection(this.firestore, 'adminUserIds')).pipe(
     map(it => {
@@ -67,11 +70,11 @@ export class DataService {
 
   private readonly reservationsCollection;
 
-  activeYear = new BehaviorSubject(2025);
-  // FIXME: query for years present in weeks collection
-  availableYears = signal([2025, 2026, 2027]);
+  activeYear = signal(new Date().getFullYear());
 
-  constructor(firestore: Firestore, auth: Auth) {
+  constructor() {
+    const firestore = inject(Firestore);
+    const auth = inject(Auth);
 
     // No unsubscribe; this is global state anyhow
     combineLatest([authState(auth), this.adminUserIds$]).subscribe(([u, a]) => {
@@ -87,6 +90,24 @@ export class DataService {
       }),
     );
 
+    const yearsCollection = collection(firestore, 'years').withConverter<YearConfig>({
+      fromFirestore: snapshot => {
+        const {annualDocumentFilename, year} = snapshot.data();
+        const {id} = snapshot;
+        return {id, annualDocumentFilename, year};
+      },
+      toFirestore: (it: never) => it,
+    });
+    this.yearsSig = toSignal(collectionData(yearsCollection).pipe(
+      catchError((_error, caught) => caught)
+    ), {initialValue: []});
+
+    this.availableYearsSig = computed(() => {
+      const years = this.yearsSig().map(it => it.year);
+      return years.sort((a, b) => a - b);
+    });
+
+
     // Get the pricing tier documents … with the ID field.
     // Also, store as a map from id to pricing tier.
     const pricingTiersCollection = collection(firestore, 'pricingTiers').withConverter<PricingTier>({
@@ -95,7 +116,7 @@ export class DataService {
         const {id} = snapshot;
         return {id, name, color};
       },
-      toFirestore: (it: any) => it,
+      toFirestore: (it: never) => it,
     });
     this.pricingTiers$ = collectionData(pricingTiersCollection).pipe(
       map(
@@ -103,7 +124,7 @@ export class DataService {
           return it.reduce((acc, tier) => {
             acc[tier.id] = tier;
             return acc;
-          }, {} as { [key: string]: PricingTier });
+          }, {} as Record<string, PricingTier>);
         }
       )
     );
@@ -115,7 +136,7 @@ export class DataService {
         const {id} = snapshot;
         return {id, year, tierId, unitId, weeklyPrice, dailyPrice};
       },
-      toFirestore: (it: any) => it,
+      toFirestore: (it: never) => it,
     });
     const weeksCollection = collection(firestore, 'weeks');
     const reservationRoundsCollection = collection(firestore, 'reservationRounds').withConverter<ReservationRoundsConfig>({
@@ -125,7 +146,7 @@ export class DataService {
         const {id} = snapshot;
         return {id, rounds, startDate, year};
       },
-      toFirestore: (it: any) => it,
+      toFirestore: (it: never) => it,
     });
     const reservationsAuditLogCollection = collection(firestore, 'reservationsAuditLog');
     this.reservationsCollection = collection(firestore, 'reservations').withConverter<Reservation>({
@@ -134,7 +155,7 @@ export class DataService {
         const {id} = snapshot;
         return {id, startDate, endDate, unitId, guestName, bookerId};
       },
-      toFirestore: (it: any) => it,
+      toFirestore: (it: never) => it,
     });
 
     this.reservationRoundsConfig$ = new BehaviorSubject({
@@ -157,7 +178,7 @@ export class DataService {
 
     // Reset the data when the user changes.
     const a = authState(auth);
-    combineLatest([this.activeYear, a]).subscribe(([year, user]) => {
+    combineLatest([toObservable(this.activeYear), a]).subscribe(([year, user]) => {
       console.info(`Using data for year: ${year}`);
 
       // If the user is not logged in, don't bother fetching data.
@@ -226,7 +247,7 @@ export class DataService {
         const {id} = snapshot;
         return {id, name, userId};
       },
-      toFirestore: (it: any) => it,
+      toFirestore: (it: never) => it,
     });
     this.bookers = toSignal(collectionData(bookersCollection).pipe(
       catchError((_error, caught) => caught)
@@ -239,7 +260,7 @@ export class DataService {
         const {id} = snapshot;
         return {id, name, floorPlanFilename, notesMarkdown};
       },
-      toFirestore: (it: any) => it,
+      toFirestore: (it: never) => it,
     });
     this.units = toSignal(collectionData(bookableUnitsCollection).pipe(
       catchError((_error, caught) => caught)
@@ -323,7 +344,7 @@ export class DataService {
     return deleteDoc(existingRef);
   }
 
-  setUnitPricing(year: number, unitId: string, unitPricings: UnitPricing[]) {
+  setUnitPricing(unitPricings: UnitPricing[]) {
     const unitPricingCollection = collection(this.firestore, 'unitPricing');
 
     const promises = unitPricings.map(unitPricing => {
@@ -338,7 +359,7 @@ export class DataService {
     return Promise.all(promises);
   }
 
-  private reservationsToMap(reservations: Reservation[]): { [key: string]: number } {
+  private reservationsToMap(reservations: Reservation[]): Record<string, number> {
     return reservations.reduce((acc, reservation) => {
       const key = reservation.bookerId;
       if (!acc[key]) {
@@ -346,7 +367,7 @@ export class DataService {
       }
       acc[key]++;
       return acc;
-    }, {} as { [key: string]: number });
+    }, {} as Record<string, number>);
   }
 
   private unitPricingsToMap(unitPricings: UnitPricing[]): UnitPricingMap {

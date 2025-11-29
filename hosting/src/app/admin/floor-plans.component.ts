@@ -13,7 +13,7 @@ import {ErrorDialog} from "../utility/error-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 
 @Component({
-  selector: 'floor-plans',
+  selector: 'app-floor-plans',
   standalone: true,
   imports: [
     MatList,
@@ -37,7 +37,7 @@ export class FloorPlanComponent {
   private readonly storage = inject(Storage);
 
   protected readonly floorPlanFilenames: Signal<string[]> = signal([]);
-  protected readonly floorPlanDownloadUrls: Signal<{ [key: string]: Observable<string> }> = computed(() => {
+  protected readonly floorPlanDownloadUrls: Signal<Record<string, Observable<string>>> = computed(() => {
     return this.refreshDownloadUrls();
   });
 
@@ -45,8 +45,8 @@ export class FloorPlanComponent {
     this.floorPlanFilenames = this.dataService.floorPlanFilenames;
   }
 
-  refreshDownloadUrls(): { [key: string]: Observable<string> } {
-    const downloadUrls = {} as { [key: string]: Observable<string> };
+  refreshDownloadUrls(): Record<string, Observable<string>> {
+    const downloadUrls = {} as Record<string, Observable<string>>;
     const rootRef = ref(this.storage, FLOOR_PLANS_FOLDER);
     this.floorPlanFilenames().forEach(filename => {
       downloadUrls[filename] = from(getDownloadURL(ref(rootRef, filename)));

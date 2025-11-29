@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, HostListener, Inject, inject, SecurityContext,} from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, inject, SecurityContext } from '@angular/core';
 import {MatButton} from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
@@ -19,7 +19,7 @@ export interface NotesDialogData {
 }
 
 @Component({
-  selector: 'notes-dialog',
+  selector: 'app-notes-dialog',
   templateUrl: 'notes-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
@@ -35,6 +35,8 @@ export interface NotesDialogData {
   ]
 })
 export class NotesDialog {
+  data = inject<NotesDialogData>(MAT_DIALOG_DATA);
+
   readonly domSanitizer = inject(DomSanitizer);
   readonly dialogRef = inject(MatDialogRef<NotesDialog>);
 
@@ -42,7 +44,9 @@ export class NotesDialog {
   notesMarkdown: string;
   renderedMarkdown: string;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: NotesDialogData) {
+  constructor() {
+    const data = this.data;
+
     this.unitName = data.unitName;
     this.notesMarkdown = data.notesMarkdown;
 

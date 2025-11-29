@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, HostListener, Inject, inject, model, output,} from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, inject, model, output } from '@angular/core';
 import {MatButton} from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
@@ -23,7 +23,7 @@ export interface EditAnnualDocumentDialogData {
 }
 
 @Component({
-  selector: 'edit-annual-document-dialog',
+  selector: 'app-edit-annual-document-dialog',
   templateUrl: 'edit-annual-document-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
@@ -46,6 +46,8 @@ export interface EditAnnualDocumentDialogData {
   ]
 })
 export class EditAnnualDocumentDialog {
+  data = inject<EditAnnualDocumentDialogData>(MAT_DIALOG_DATA);
+
   private readonly dataService = inject(DataService);
   readonly dialogRef = inject(MatDialogRef<EditAnnualDocumentDialog>);
 
@@ -54,7 +56,9 @@ export class EditAnnualDocumentDialog {
 
   readonly availableFilenames = this.dataService.annualDocumentFilenames;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: EditAnnualDocumentDialogData) {
+  constructor() {
+    const data = this.data;
+
     this.annualDocumentFilename.set(data.annualDocumentFilename);
   }
 

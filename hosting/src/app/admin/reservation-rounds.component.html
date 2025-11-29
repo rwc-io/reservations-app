@@ -30,7 +30,7 @@
       </ul>
 
       <h2>Preview</h2>
-      <round-config [rounds$]="rounds()" [bookers]="bookers"/>
+      <app-round-config [rounds$]="rounds()" [bookers]="bookers"/>
     </mat-card-content>
     <mat-card-actions>
       <button mat-button class="primary-button" (click)="onSubmit()" [disabled]="false">Update</button>

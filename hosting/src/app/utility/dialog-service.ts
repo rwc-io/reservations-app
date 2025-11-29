@@ -7,7 +7,7 @@ import {Injectable, TemplateRef} from '@angular/core';
 })
 export class DialogService extends MatDialog {
   // Adapted from Abhinav Kumar: https://stackoverflow.com/a/79210442/211771
-  override open<T, D = any, R = any>(component: ComponentType<T> | TemplateRef<T>, config?: MatDialogConfig<D>): MatDialogRef<T, R> {
+  override open<T, D, R>(component: ComponentType<T> | TemplateRef<T>, config?: MatDialogConfig<D>): MatDialogRef<T, R> {
     const activeElement = document.activeElement as HTMLElement;
     if (activeElement) {
       activeElement.blur();

@@ -15,7 +15,7 @@ import {NgForOf} from '@angular/common';
 import {ShortDate} from '../utility/short-date.pipe';
 
 @Component({
-  selector: 'round-config',
+  selector: 'app-round-config',
   templateUrl: 'round-config.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,

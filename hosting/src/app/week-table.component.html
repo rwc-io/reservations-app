@@ -47,30 +47,32 @@
                 Reserved by the day
               </mat-expansion-panel-header>
               <mat-list>
-                <mat-list-item *ngFor="let day of weekDates(weekRow)">
-                  @let reservation = reservationForDay(unitReservations, day);
-                  <span matListItemTitle>
-                  {{ day | shortDate }}
-                    @if (!!reservation && canEditReservation(reservation)) {
-                      <span style="float: right">
-                      <button mat-icon-button aria-label="Edit reservation"
-                              (click)="editReservation(reservation, weekRow)">
-                        <mat-icon>edit</mat-icon>
-                      </button>
+                @for (day of weekDates(weekRow); track $index) {
+                  <mat-list-item>
+                    @let reservation = reservationForDay(unitReservations, day);
+                    <span matListItemTitle>
+                      <span>{{ day | shortDate }}</span>
+                      @if (!!reservation && canEditReservation(reservation)) {
+                        <span style="float: right">
+                          <button mat-icon-button aria-label="Edit reservation"
+                                  (click)="editReservation(reservation, weekRow)">
+                            <mat-icon>edit</mat-icon>
+                          </button>
+                        </span>
+                      }
+                      @if (!reservation && canAddDailyReservation()) {
+                        <div class="add-button" style="float: right">
+                          <button mat-icon-button aria-label="Add reservation"
+                                  (click)="addReservation(weekRow, unit, day, day.plus({days: 1}))">
+                            <mat-icon class="material-icons-outlined">add_box</mat-icon>
+                        </button>
+                        </div>
+                      }
                     </span>
-                    }
-                    @if (!reservation && canAddDailyReservation()) {
-                      <div class="add-button" style="float: right">
-                      <button mat-icon-button aria-label="Add reservation"
-                              (click)="addReservation(weekRow, unit, day, day.plus({days: 1}))">
-                        <mat-icon class="material-icons-outlined">add_box</mat-icon>
-                      </button>
-                    </div>
-                    }
-                </span>
-                  <span matListItemLine>{{ reservation?.guestName }}</span>
-                  <span>{{ bookerName(reservation?.bookerId || "") || '' }}</span>
-                </mat-list-item>
+                    <span matListItemLine>{{ reservation?.guestName }}</span>
+                    <span>{{ bookerName(reservation?.bookerId || "") || '' }}</span>
+                  </mat-list-item>
+                }
               </mat-list>
             </mat-expansion-panel>
           </mat-accordion>
@@ -101,16 +103,18 @@
       </td>
       <td mat-footer-cell *matFooterCellDef>
         <table class="mat-mdc-table">
-          <tr class="mat-mdc-row" *ngFor="let item of pricingTiers | keyvalue" [style]="rowStyle($any(item.value))">
-            @let tier = $any(item.value);
-            <td mat-cell>
-              {{ tier.name }}
-            </td>
-            <td class="mat-mdc-cell">
-              {{ unitTierPricing(unit, tier)?.weeklyPrice | currency }}/wk<br/>
-              {{ unitTierPricing(unit, tier)?.dailyPrice | currency }}/day
-            </td>
-          </tr>
+          @for (item of pricingTiers | keyvalue; track item.value) {
+            <tr class="mat-mdc-row" [style]="rowStyle($any(item.value))">
+              @let tier = $any(item.value);
+              <td mat-cell>
+                {{ tier.name }}
+              </td>
+              <td class="mat-mdc-cell">
+                {{ unitTierPricing(unit, tier)?.weeklyPrice | currency }}/wk<br/>
+                {{ unitTierPricing(unit, tier)?.dailyPrice | currency }}/day
+              </td>
+            </tr>
+          }
         </table>
       </td>
     </ng-container>
