@@ -322,7 +322,7 @@ export class DataService {
     return deleteDoc(existingRef);
   }
 
-  setUnitPricing(year: number, unitId: string, unitPricings: UnitPricing[]) {
+  setUnitPricing(unitPricings: UnitPricing[]) {
     const unitPricingCollection = collection(this.firestore, 'unitPricing');
 
     const promises = unitPricings.map(unitPricing => {

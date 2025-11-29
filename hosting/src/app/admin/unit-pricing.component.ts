@@ -111,7 +111,7 @@ export class UnitPricingComponent implements OnInit, OnDestroy {
       } as UnitPricing;
     });
 
-    this.dataService.setUnitPricing(this.year(), this.selectedUnitId(), unitPricings).then(
+    this.dataService.setUnitPricing(unitPricings).then(
       () => {
         this.snackBar.open('Pricing updated', 'Ok', {
           duration: 3000
