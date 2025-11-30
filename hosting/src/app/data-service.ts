@@ -40,7 +40,7 @@ export class DataService {
   private readonly firestore: Firestore = inject(Firestore);
   private readonly storage = inject(Storage);
 
-  annualDocumentFilename: WritableSignal<string>;
+  annualDocumentFilename: Signal<string>;
   bookers: Signal<Booker[]>;
   pricingTiers$: Observable<PricingTierMap>;
   readonly reservationRoundsConfig$;
@@ -167,7 +167,6 @@ export class DataService {
     this.reservations$ = new BehaviorSubject([] as Reservation[]);
     this.reservationsAuditLog$ = new BehaviorSubject([] as ReservationAuditLog[]);
     this.unitPricing$ = new BehaviorSubject({} as UnitPricingMap);
-    this.annualDocumentFilename = signal('');
     this.weeks$ = new BehaviorSubject([] as ReservableWeek[]);
 
     let reservationRoundsConfigSubscription: Subscription;
@@ -229,14 +228,20 @@ export class DataService {
       weeksSubscription = collectionData(weeksQuery).subscribe((it) => {
         if (it.length === 0) {
           this.weeks$.next([] as ReservableWeek[]);
-          this.annualDocumentFilename.set('');
         } else {
           const configData = it[0] as ConfigData;
           this.weeks$.next(configData.weeks as ReservableWeek[]);
-          this.annualDocumentFilename.set(configData.annualDocumentFilename);
         }
       });
     });
+
+    this.annualDocumentFilename = computed(() => {
+      const yearsConfig = this.yearsSig().find((x) => x.year == this.activeYear())
+      if (!yearsConfig) {
+        return '';
+      }
+      return yearsConfig.annualDocumentFilename;
+    })
 
     // Data not connected to years:
 

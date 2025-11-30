@@ -15,7 +15,6 @@ export interface Booker {
 }
 
 export interface ConfigData {
-  annualDocumentFilename: string;
   year: number;
   weeks: ReservableWeek[];
 }
@@ -97,4 +96,5 @@ export type UnitPricingMap = Record<string, UnitPricing[]>;
 export interface YearConfig {
   id: string;
   year: number;
+  annualDocumentFilename: string;
 }
