@@ -5,7 +5,7 @@ import {map, Subscription} from 'rxjs';
 import {Storage} from '@angular/fire/storage';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatDialog} from "@angular/material/dialog";
-import {PricingTierMap, UnitPricing, UnitPricingMap} from '../types';
+import {PricingTier, UnitPricing, UnitPricingMap} from '../types';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
@@ -48,8 +48,8 @@ export class UnitPricingComponent implements OnInit, OnDestroy {
   selectedUnitId = signal('');
   units = this.dataService.units;
   allPricings = toSignal(this.dataService.unitPricing$, {initialValue: {} as UnitPricingMap});
-  tiers = toSignal(this.dataService.pricingTiers$, {initialValue: {} as PricingTierMap});
-  tierIds = computed(() => Object.keys(this.tiers()))
+  tiers = toSignal(this.dataService.pricingTiers$, {initialValue: [] as PricingTier[]});
+  tierIds = computed(() => this.tiers().map(t => t.id))
 
   unit = computed(() => {
     return this.units().find(unit => unit.id === this.selectedUnitId())

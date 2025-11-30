@@ -89,7 +89,7 @@ export class ReservationsComponent implements OnDestroy {
   reservations$: Observable<Reservation[]>;
   reservationsAuditLog$: Observable<ReservationAuditLog[]>;
   units: Signal<BookableUnit[]>;
-  pricingTiers$: Observable<Record<string, PricingTier>>;
+  pricingTiers$: Observable<PricingTier[]>;
   unitPricing$: Observable<UnitPricingMap>;
 
   isAdmin = this.dataService.isAdmin;

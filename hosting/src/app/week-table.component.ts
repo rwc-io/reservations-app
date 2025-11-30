@@ -22,7 +22,6 @@ import {
   BookableUnit,
   Booker,
   PricingTier,
-  PricingTierMap,
   ReservableWeek,
   Reservation,
   UnitPricing,
@@ -111,7 +110,7 @@ export class WeekTableComponent {
   private _bookers: WritableSignal<Booker[]> = signal([]);
   private _currentBooker: WritableSignal<Booker | undefined> = signal(undefined);
   private _reservations: Reservation[] = [];
-  private _pricingTiers: PricingTierMap = {};
+  private _pricingTiers: PricingTier[] = [];
   private _units: BookableUnit[] = [];
   private _weeks: ReservableWeek[] = [];
   private _unitPricing: UnitPricingMap = {};
@@ -127,6 +126,10 @@ export class WeekTableComponent {
     const weeks = this._weeks;
     const units = this._units;
     const pricingTiers = this._pricingTiers;
+    const pricingTiersById: Record<string, PricingTier> = pricingTiers.reduce((acc, t) => {
+      acc[t.id] = t;
+      return acc;
+    }, {} as Record<string, PricingTier>);
     const reservations = this._reservations;
 
     this.displayedColumns = ['week', ...units.map(unit => unit.name)];
@@ -134,7 +137,7 @@ export class WeekTableComponent {
       weeks.map(week => {
         const startDate = DateTime.fromISO(week.startDate);
         const endDate = startDate.plus({days: 7});
-        const pricingTier = pricingTiers[week.pricingTierId];
+        const pricingTier = pricingTiersById[week.pricingTierId];
 
         const weekReservations = reservations.filter(reservation => {
           const reservationStartDate = DateTime.fromISO(reservation.startDate);
@@ -205,7 +208,7 @@ export class WeekTableComponent {
   }
 
   @Input()
-  set pricingTiers(value: PricingTierMap) {
+  set pricingTiers(value: PricingTier[]) {
     this._pricingTiers = value;
     this.buildTableRows();
   }
