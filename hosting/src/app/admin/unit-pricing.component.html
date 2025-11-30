@@ -13,8 +13,8 @@
     </mat-card-header>
     <mat-card-content>
       <form [formGroup]="form()">
-        @for (tierId of tierIds(); track tierId) {
-          @let tier = tiers()[tierId];
+        @for (tier of tiers(); track tier.id) {
+          @let tierId = tier.id;
 
           <h4>{{ tier.name }}</h4>
           <div>

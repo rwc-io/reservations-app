@@ -5,7 +5,6 @@ import {
   Booker,
   ConfigData,
   PricingTier,
-  PricingTierMap,
   ReservableWeek,
   Reservation,
   ReservationAuditLog,
@@ -42,7 +41,7 @@ export class DataService {
 
   annualDocumentFilename: Signal<string>;
   bookers: Signal<Booker[]>;
-  pricingTiers$: Observable<PricingTierMap>;
+  pricingTiers$: Observable<PricingTier[]>;
   readonly reservationRoundsConfig$;
   readonly reservations$: BehaviorSubject<Reservation[]>;
   readonly reservationsAuditLog$: BehaviorSubject<ReservationAuditLog[]>;
@@ -109,7 +108,6 @@ export class DataService {
 
 
     // Get the pricing tier documents … with the ID field.
-    // Also, store as a map from id to pricing tier.
     const pricingTiersCollection = collection(firestore, 'pricingTiers').withConverter<PricingTier>({
       fromFirestore: snapshot => {
         const {name, color} = snapshot.data();
@@ -118,16 +116,7 @@ export class DataService {
       },
       toFirestore: (it: never) => it,
     });
-    this.pricingTiers$ = collectionData(pricingTiersCollection).pipe(
-      map(
-        it => {
-          return it.reduce((acc, tier) => {
-            acc[tier.id] = tier;
-            return acc;
-          }, {} as Record<string, PricingTier>);
-        }
-      )
-    );
+    this.pricingTiers$ = collectionData(pricingTiersCollection);
 
     const unitPricingCollection = collection(firestore, 'unitPricing').withConverter<UnitPricing>({
       // We need this to add in the id field.

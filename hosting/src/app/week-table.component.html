@@ -103,9 +103,8 @@
       </td>
       <td mat-footer-cell *matFooterCellDef>
         <table class="mat-mdc-table">
-          @for (item of pricingTiers | keyvalue; track item.value) {
-            <tr class="mat-mdc-row" [style]="rowStyle($any(item.value))">
-              @let tier = $any(item.value);
+          @for (tier of pricingTiers; track tier.id) {
+            <tr class="mat-mdc-row" [style]="rowStyle(tier)">
               <td mat-cell>
                 {{ tier.name }}
               </td>
