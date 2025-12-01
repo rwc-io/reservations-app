@@ -429,4 +429,17 @@ export class DataService {
       (this.floorPlanFilenames as WritableSignal<string[]>).set(items)
     });
   }
+
+  async addYear(year: number) {
+    // Prevent duplicates
+    const existing = this.availableYearsSig();
+    if (existing.includes(year)) {
+      return;
+    }
+
+    const yearsCollection = collection(this.firestore, 'years');
+    await addDoc(yearsCollection, {
+      year,
+    });
+  }
 }
