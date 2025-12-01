@@ -1,0 +1,25 @@
+<mat-card>
+  <mat-card-header>
+    <h1>Weeks for {{ year() }}</h1>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-list>
+      @for (week of weeksSig(); track week.startDate) {
+        <mat-list-item>
+          <div>
+            <div matListItemTitle>
+              {{ formatDate(week.startDate) }} — {{ pricingTierName(week.pricingTierId) }}
+            </div>
+            <div matListItemLine>
+              <button mat-button class="secondary-button" (click)="editWeek($index)">Edit</button>
+              <button mat-button class="error-button" (click)="deleteWeek($index)">Delete</button>
+            </div>
+          </div>
+        </mat-list-item>
+      }
+    </mat-list>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-button class="primary-button" (click)="addWeek()" [disabled]="allWeeksDefined()">Add week</button>
+  </mat-card-actions>
+</mat-card>

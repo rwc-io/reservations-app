@@ -1,0 +1,51 @@
+<h2 mat-dialog-title>
+  @if (data.mode === 'edit') {
+    Modify week
+  } @else {
+    Add week
+  }
+</h2>
+
+<mat-dialog-content>
+  <div>
+    <mat-form-field>
+      <mat-label>Start date (Saturday)</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        [disabled]="data.mode === 'edit'"
+        [matDatepickerFilter]="dateFilter"
+        [(ngModel)]="startDate"
+        [min]="yearStart"
+        [max]="yearEnd"
+      />
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker startView="month"></mat-datepicker>
+    </mat-form-field>
+  </div>
+
+  <div>
+    <mat-form-field>
+      <mat-label>Pricing tier</mat-label>
+      <mat-select [(ngModel)]="pricingTierId">
+        @for (tier of (pricingTiers$ | async); track tier.id) {
+          <mat-option [value]="tier.id">{{ tier.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  @if (data.mode === 'edit') {
+    <button mat-button class="error-button" (click)="onDelete()">Delete</button>
+  }
+  <button mat-button class="secondary-button" [mat-dialog-close]="null">Cancel</button>
+  <button mat-button class="primary-button" (click)="onSubmit()" [disabled]="!isValid()">
+    @if (data.mode === 'edit') {
+      Save
+    } @else {
+      Add
+    }
+  </button>
+</mat-dialog-actions>

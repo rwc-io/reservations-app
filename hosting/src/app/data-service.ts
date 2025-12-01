@@ -3,7 +3,7 @@ import {BehaviorSubject, catchError, combineLatest, map, Observable, Subscriptio
 import {
   BookableUnit,
   Booker,
-  ConfigData,
+  WeeksConfig,
   PricingTier,
   ReservableWeek,
   Reservation,
@@ -49,6 +49,7 @@ export class DataService {
   units: Signal<BookableUnit[]>;
   readonly unitPricing$: BehaviorSubject<UnitPricingMap>;
   weeks$: BehaviorSubject<ReservableWeek[]>;
+  weeksConfig$: BehaviorSubject<WeeksConfig>;
 
   yearsSig: Signal<YearConfig[]>;
   availableYearsSig: Signal<number[]>;
@@ -127,7 +128,14 @@ export class DataService {
       },
       toFirestore: (it: never) => it,
     });
-    const weeksCollection = collection(firestore, 'weeks');
+    const weeksCollection = collection(firestore, 'weeks').withConverter<WeeksConfig>({
+      fromFirestore: snapshot => {
+        const {year, weeks} = snapshot.data();
+        const {id} = snapshot;
+        return {id, year, weeks};
+      },
+      toFirestore: (it: never) => it,
+    });
     const reservationRoundsCollection = collection(firestore, 'reservationRounds').withConverter<ReservationRoundsConfig>({
       // We need this to add in the id field.
       fromFirestore: snapshot => {
@@ -157,6 +165,7 @@ export class DataService {
     this.reservationsAuditLog$ = new BehaviorSubject([] as ReservationAuditLog[]);
     this.unitPricing$ = new BehaviorSubject({} as UnitPricingMap);
     this.weeks$ = new BehaviorSubject([] as ReservableWeek[]);
+    this.weeksConfig$ = new BehaviorSubject({ id: '', year: 1900, weeks: [] } as WeeksConfig);
 
     let reservationRoundsConfigSubscription: Subscription;
     let reservationsAuditLogSubscription: Subscription;
@@ -216,9 +225,11 @@ export class DataService {
       const weeksQuery = query(weeksCollection, where('year', '==', year), limit(1));
       weeksSubscription = collectionData(weeksQuery).subscribe((it) => {
         if (it.length === 0) {
+          this.weeksConfig$.next({ id: '', year, weeks: [] } as WeeksConfig);
           this.weeks$.next([] as ReservableWeek[]);
         } else {
-          const configData = it[0] as ConfigData;
+          const configData = it[0] as WeeksConfig;
+          this.weeksConfig$.next(configData);
           this.weeks$.next(configData.weeks as ReservableWeek[]);
         }
       });
@@ -288,6 +299,16 @@ export class DataService {
       return updateDoc(existingRef, {...config});
     } else {
       return addDoc(reservationRoundsCollection, config);
+    }
+  }
+
+  updateWeeksConfig(config: WeeksConfig) {
+    const weeksCollection = collection(this.firestore, 'weeks');
+    if (config.id) {
+      const existingRef = doc(weeksCollection, config.id);
+      return updateDoc(existingRef, { ...config });
+    } else {
+      return addDoc(weeksCollection, config);
     }
   }
 

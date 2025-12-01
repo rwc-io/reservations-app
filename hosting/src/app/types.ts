@@ -14,13 +14,10 @@ export interface Booker {
   userId: string;
 }
 
-export interface ConfigData {
+export interface WeeksConfig {
+  id: string;
   year: number;
   weeks: ReservableWeek[];
-}
-
-export interface Permissions {
-  adminUserIds: string[];
 }
 
 export interface PricingTier {
@@ -28,8 +25,6 @@ export interface PricingTier {
   name: string;
   color: number[];
 }
-
-export type PricingTierMap = Record<string, PricingTier>;
 
 export interface ReservableWeek {
   startDate: string;
