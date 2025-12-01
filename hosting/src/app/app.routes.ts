@@ -7,6 +7,7 @@ import {ReservationRoundsComponent} from './admin/reservation-rounds.component';
 import {PasswordsComponent} from './admin/passwords.component';
 import {AnnualDocumentsComponent} from './admin/annual-documents.component';
 import {DataService} from './data-service';
+import {WeeksComponent} from './admin/weeks.component';
 import {inject} from '@angular/core';
 
 const isAdminGuard: CanActivateFn = (
@@ -39,6 +40,10 @@ export const routes: Routes = [
       {
         path: 'reservation-rounds',
         component: ReservationRoundsComponent,
+      },
+      {
+        path: 'weeks',
+        component: WeeksComponent,
       },
       {
         path: 'unit-pricing',
