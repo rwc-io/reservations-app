@@ -119,7 +119,7 @@
     </ng-container>
   }
 
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
   <tr mat-row class="weeks-content" *matRowDef="let row; columns: displayedColumns"
       [style]="rowStyle(row.pricingTier)">
   </tr>
