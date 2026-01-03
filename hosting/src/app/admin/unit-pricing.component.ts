@@ -17,6 +17,7 @@ import {MatTableModule} from '@angular/material/table';
 import {MatDivider} from '@angular/material/divider';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {ErrorDialog} from '../utility/error-dialog.component';
+import {CopyPricingDialog} from './copy-pricing-dialog.component';
 
 interface UnitPricingRow {
   unitName: string;
@@ -57,6 +58,7 @@ export class UnitPricingComponent implements OnInit, OnDestroy {
   private readonly storage = inject(Storage);
 
   year = this.dataService.activeYear
+  availableYears = this.dataService.availableYearsSig;
   selectedUnitId = signal('');
   units = this.dataService.units;
   allPricings = toSignal(this.dataService.unitPricing$, {initialValue: {} as UnitPricingMap});
@@ -126,6 +128,29 @@ export class UnitPricingComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.paramSubscription?.unsubscribe();
+  }
+
+  onCopyFrom() {
+    const availableYears = this.availableYears().filter(y => y !== this.year());
+
+    const dialogRef = this.dialog.open(CopyPricingDialog, {
+      data: {
+        activeYear: this.year(),
+        availableYears,
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(fromYear => {
+      if (fromYear) {
+        this.dataService.copyUnitPricing(fromYear, this.year()).then(() => {
+          this.snackBar.open('Pricing copied', 'Ok', {
+            duration: 3000
+          });
+        }).catch(error => {
+          this.dialog.open(ErrorDialog, {data: `Couldn't copy pricing: ${error.message}`});
+        });
+      }
+    });
   }
 
   onSubmit() {

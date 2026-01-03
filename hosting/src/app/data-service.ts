@@ -24,7 +24,9 @@ import {
   limit,
   query,
   updateDoc,
-  where
+  where,
+  getDocs,
+  writeBatch
 } from '@angular/fire/firestore';
 import {Auth, User} from '@angular/fire/auth';
 import {toObservable, toSignal} from '@angular/core/rxjs-interop';
@@ -372,6 +374,37 @@ export class DataService {
     });
 
     return Promise.all(promises);
+  }
+
+  async copyUnitPricing(fromYear: number, toYear: number) {
+    const unitPricingCollection = collection(this.firestore, 'unitPricing');
+
+    const sourceQuery = query(unitPricingCollection, where('year', '==', fromYear));
+    const targetQuery = query(unitPricingCollection, where('year', '==', toYear));
+
+    const [sourceSnap, targetSnap] = await Promise.all([
+      getDocs(sourceQuery),
+      getDocs(targetQuery),
+    ]);
+
+    const batch = writeBatch(this.firestore);
+
+    // Delete existing target pricings
+    targetSnap.forEach(snap => {
+      batch.delete(snap.ref);
+    });
+
+    // Add source pricings mapped to target year
+    sourceSnap.forEach(snap => {
+      const data = snap.data();
+      const newRef = doc(unitPricingCollection);
+      batch.set(newRef, {
+        ...data,
+        year: toYear
+      });
+    });
+
+    return batch.commit();
   }
 
   private reservationsToMap(reservations: Reservation[]): Record<string, number> {

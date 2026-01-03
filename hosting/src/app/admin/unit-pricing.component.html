@@ -29,6 +29,7 @@
   <mat-card-content>
     <mat-form-field>
       <mat-select [(ngModel)]="selectedUnitId" placeholder="Select a unit…">
+        <mat-option [value]=""></mat-option>
         @for (unit of units(); track unit.id) {
           <mat-option [value]="unit.id">{{ unit.name }}</mat-option>
         }
@@ -61,9 +62,10 @@
       </div>
     }
   </mat-card-content>
-  @if (unit()) {
-    <mat-card-actions>
+  <mat-card-actions>
+    <button mat-button (click)="onCopyFrom()">Bulk pricing copy</button>
+    @if (unit()) {
       <button mat-button class="primary-button" (click)="onSubmit()" [disabled]="!form().valid">Update</button>
-    </mat-card-actions>
-  }
+    }
+  </mat-card-actions>
 </mat-card>
