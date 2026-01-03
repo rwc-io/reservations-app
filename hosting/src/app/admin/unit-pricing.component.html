@@ -1,41 +1,67 @@
-<mat-form-field>
-  <mat-select [(ngModel)]="selectedUnitId" placeholder="Select a unit…">
-    @for (unit of units(); track unit.id) {
-      <mat-option [value]="unit.id">{{ unit.name }}</mat-option>
-    }
-  </mat-select>
-</mat-form-field>
+<mat-card>
+  <mat-card-header><h1>Pricing summary</h1></mat-card-header>
+  <mat-card-content>
+    <table mat-table [dataSource]="dataSource()">
+      <ng-container matColumnDef="unitName">
+        <th mat-header-cell *matHeaderCellDef>Unit</th>
+        <td mat-cell *matCellDef="let element">{{ element.unitName }}</td>
+      </ng-container>
 
-@if (unit()) {
-  <mat-card>
-    <mat-card-header>
-      <h1>Unit pricing for {{ unit()?.name }} in {{ this.year() }}</h1>
-    </mat-card-header>
-    <mat-card-content>
-      <form [formGroup]="form()">
-        @for (tier of tiers(); track tier.id) {
-          @let tierId = tier.id;
+      @for (tier of tiers(); track tier.id) {
+        <ng-container [matColumnDef]="tier.id">
+          <th mat-header-cell *matHeaderCellDef>{{ tier.name }}</th>
+          <td mat-cell *matCellDef="let element">${{ element.prices[tier.id] }}</td>
+        </ng-container>
+      }
 
-          <h4>{{ tier.name }}</h4>
-          <div>
-            <mat-form-field>
-              <mat-label>Daily price</mat-label>
-              <input matInput type="number" required [formControlName]="tierId + '_dailyPrice'"
-                     [id]="tierId + '_dailyPrice'">
-            </mat-form-field>
-          </div>
-          <div>
-            <mat-form-field>
-              <mat-label>Weekly price</mat-label>
-              <input matInput type="number" required [formControlName]="tierId + '_weeklyPrice'"
-                     [id]="tierId + '_weeklyPrice'">
-            </mat-form-field>
-          </div>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns();"></tr>
+    </table>
+  </mat-card-content>
+</mat-card>
+
+<mat-divider></mat-divider>
+
+<mat-card>
+  <mat-card-header><h1>Edit unit pricing</h1></mat-card-header>
+  <mat-card-content>
+    <mat-form-field>
+      <mat-select [(ngModel)]="selectedUnitId" placeholder="Select a unit…">
+        @for (unit of units(); track unit.id) {
+          <mat-option [value]="unit.id">{{ unit.name }}</mat-option>
         }
-      </form>
-    </mat-card-content>
+      </mat-select>
+    </mat-form-field>
+
+    @if (unit()) {
+      <div>
+        <form [formGroup]="form()">
+          @for (tier of tiers(); track tier.id) {
+            @let tierId = tier.id;
+
+            <h4>{{ tier.name }}</h4>
+            <div>
+              <mat-form-field>
+                <mat-label>Daily price</mat-label>
+                <input matInput type="number" required [formControlName]="tierId + '_dailyPrice'"
+                       [id]="tierId + '_dailyPrice'">
+              </mat-form-field>
+            </div>
+            <div>
+              <mat-form-field>
+                <mat-label>Weekly price</mat-label>
+                <input matInput type="number" required [formControlName]="tierId + '_weeklyPrice'"
+                       [id]="tierId + '_weeklyPrice'">
+              </mat-form-field>
+            </div>
+          }
+        </form>
+      </div>
+    }
+  </mat-card-content>
+  @if (unit()) {
     <mat-card-actions>
       <button mat-button class="primary-button" (click)="onSubmit()" [disabled]="!form().valid">Update</button>
     </mat-card-actions>
-  </mat-card>
-}
+  }
+</mat-card>

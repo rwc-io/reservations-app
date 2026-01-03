@@ -10,11 +10,17 @@ import {toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatOption, MatSelect} from '@angular/material/select';
-import {NgForOf} from '@angular/common';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatInput} from '@angular/material/input';
 import {MatButton} from '@angular/material/button';
+import {MatTableModule} from '@angular/material/table';
+import {MatDivider} from '@angular/material/divider';
 import {ErrorDialog} from '../utility/error-dialog.component';
+
+interface UnitPricingRow {
+  unitName: string;
+  prices: Record<string, number>;
+}
 
 @Component({
   selector: 'app-unit-pricing',
@@ -26,13 +32,14 @@ import {ErrorDialog} from '../utility/error-dialog.component';
     MatFormField,
     MatSelect,
     MatOption,
-    NgForOf,
     FormsModule,
     MatInput,
     MatLabel,
     ReactiveFormsModule,
     MatCardActions,
     MatButton,
+    MatTableModule,
+    MatDivider,
   ],
   templateUrl: './unit-pricing.component.html',
   host: {
@@ -53,6 +60,31 @@ export class UnitPricingComponent implements OnInit, OnDestroy {
   allPricings = toSignal(this.dataService.unitPricing$, {initialValue: {} as UnitPricingMap});
   tiers = toSignal(this.dataService.pricingTiers$, {initialValue: [] as PricingTier[]});
   tierIds = computed(() => this.tiers().map(t => t.id))
+
+  dataSource = computed(() => {
+    const units = this.units();
+    const allPricings = this.allPricings();
+    const tiers = this.tiers();
+
+    return units.map(unit => {
+      const pricing = allPricings[unit.id] || [];
+      const row: UnitPricingRow = {
+        unitName: unit.name,
+        prices: {}
+      };
+
+      tiers.forEach(tier => {
+        const p = pricing.find(x => x.tierId === tier.id);
+        row.prices[tier.id] = p?.weeklyPrice ?? p?.dailyPrice ?? 0;
+      });
+
+      return row;
+    });
+  });
+
+  displayedColumns = computed(() => {
+    return ['unitName', ...this.tierIds()];
+  });
 
   unit = computed(() => {
     return this.units().find(unit => unit.id === this.selectedUnitId())
