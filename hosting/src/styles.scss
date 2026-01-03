@@ -83,3 +83,14 @@ main {
 
   padding-bottom: 48px;
 }
+
+.admin-component-contents {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  align-content: stretch;
+  align-items: stretch;
+  justify-content: flex-start;
+}

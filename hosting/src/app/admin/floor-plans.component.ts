@@ -29,6 +29,9 @@ import {MatDialog} from "@angular/material/dialog";
     MatFabButton
   ],
   templateUrl: './floor-plans.component.html',
+  host: {
+    'class': 'admin-component-contents'
+  }
 })
 export class FloorPlanComponent {
   private readonly dataService = inject(DataService);

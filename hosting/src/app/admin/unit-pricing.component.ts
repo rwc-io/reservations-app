@@ -35,6 +35,9 @@ import {ErrorDialog} from '../utility/error-dialog.component';
     MatButton,
   ],
   templateUrl: './unit-pricing.component.html',
+  host: {
+    'class': 'admin-component-contents'
+  }
 })
 export class UnitPricingComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);

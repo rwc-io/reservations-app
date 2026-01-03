@@ -25,6 +25,9 @@ import {DateTime} from 'luxon';
     MatButton,
   ],
   templateUrl: './weeks.component.html',
+  host: {
+    'class': 'admin-component-contents'
+  }
 })
 export class WeeksComponent {
   private readonly dataService = inject(DataService);
