@@ -15,6 +15,7 @@ import {MatInput} from '@angular/material/input';
 import {MatButton} from '@angular/material/button';
 import {MatTableModule} from '@angular/material/table';
 import {MatDivider} from '@angular/material/divider';
+import {MatExpansionModule} from '@angular/material/expansion';
 import {ErrorDialog} from '../utility/error-dialog.component';
 
 interface UnitPricingRow {
@@ -40,6 +41,7 @@ interface UnitPricingRow {
     MatButton,
     MatTableModule,
     MatDivider,
+    MatExpansionModule,
   ],
   templateUrl: './unit-pricing.component.html',
   host: {
