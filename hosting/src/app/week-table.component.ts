@@ -12,6 +12,7 @@ import {
   MatHeaderCellDef,
   MatHeaderRow,
   MatHeaderRowDef,
+  MatNoDataRow,
   MatRow,
   MatRowDef,
   MatTable
@@ -84,6 +85,7 @@ interface WeekReservation {
     AsyncPipe,
     MatButton,
     MatAnchor,
+    MatNoDataRow,
   ],
   templateUrl: './week-table.component.html',
   styleUrl: './week-table.component.css'
