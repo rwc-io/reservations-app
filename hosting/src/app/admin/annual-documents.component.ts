@@ -14,7 +14,6 @@ import {MatDialog} from "@angular/material/dialog";
 
 @Component({
   selector: 'app-annual-documents',
-  standalone: true,
   imports: [
     MatList,
     MatListItem,
@@ -31,7 +30,7 @@ import {MatDialog} from "@angular/material/dialog";
   templateUrl: './annual-documents.component.html',
   host: {
     'class': 'admin-component-contents'
-  }
+  },
 })
 export class AnnualDocumentsComponent {
   private readonly dataService = inject(DataService);

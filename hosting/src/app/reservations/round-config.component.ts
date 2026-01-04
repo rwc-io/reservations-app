@@ -11,16 +11,13 @@ import {
 import {DateTime} from 'luxon';
 import {Booker, ReservationRound} from '../types';
 import {Observable, Subscription} from 'rxjs';
-import {NgForOf} from '@angular/common';
 import {ShortDate} from '../utility/short-date.pipe';
 
 @Component({
   selector: 'app-round-config',
   templateUrl: 'round-config.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
-    NgForOf,
     ShortDate
   ]
 })

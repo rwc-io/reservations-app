@@ -14,7 +14,6 @@ import {Auth, updatePassword} from '@angular/fire/auth';
 
 @Component({
   selector: 'app-passwords',
-  standalone: true,
   imports: [
     MatCard,
     MatCardHeader,
@@ -25,7 +24,7 @@ import {Auth, updatePassword} from '@angular/fire/auth';
   templateUrl: './passwords.component.html',
   host: {
     'class': 'admin-component-contents'
-  }
+  },
 })
 export class PasswordsComponent {
   private readonly auth = inject(Auth);

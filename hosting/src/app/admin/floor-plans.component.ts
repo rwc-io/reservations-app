@@ -14,7 +14,6 @@ import {MatDialog} from "@angular/material/dialog";
 
 @Component({
   selector: 'app-floor-plans',
-  standalone: true,
   imports: [
     MatList,
     MatListItem,
@@ -31,7 +30,7 @@ import {MatDialog} from "@angular/material/dialog";
   templateUrl: './floor-plans.component.html',
   host: {
     'class': 'admin-component-contents'
-  }
+  },
 })
 export class FloorPlanComponent {
   private readonly dataService = inject(DataService);

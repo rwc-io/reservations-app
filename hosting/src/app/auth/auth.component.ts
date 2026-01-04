@@ -33,7 +33,6 @@ export const authState = ɵzoneWrap(_authState, true);
 @Component({
   selector: 'app-auth',
   templateUrl: 'auth.component.html',
-  standalone: true,
   imports: [AsyncPipe, MatError, MatIcon, MatIconButton, MatButton]
 })
 export class AuthComponent implements OnDestroy {

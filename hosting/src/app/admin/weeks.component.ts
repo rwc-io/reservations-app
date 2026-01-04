@@ -12,7 +12,6 @@ import {DateTime} from 'luxon';
 
 @Component({
   selector: 'app-weeks-admin',
-  standalone: true,
   imports: [
     MatCard,
     MatCardHeader,
@@ -27,7 +26,7 @@ import {DateTime} from 'luxon';
   templateUrl: './weeks.component.html',
   host: {
     'class': 'admin-component-contents'
-  }
+  },
 })
 export class WeeksComponent {
   private readonly dataService = inject(DataService);

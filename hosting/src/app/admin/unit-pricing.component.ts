@@ -26,7 +26,6 @@ interface UnitPricingRow {
 
 @Component({
   selector: 'app-unit-pricing',
-  standalone: true,
   imports: [
     MatCard,
     MatCardHeader,
@@ -47,7 +46,7 @@ interface UnitPricingRow {
   templateUrl: './unit-pricing.component.html',
   host: {
     'class': 'admin-component-contents'
-  }
+  },
 })
 export class UnitPricingComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);

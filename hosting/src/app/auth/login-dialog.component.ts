@@ -15,8 +15,7 @@ import {MatInputModule} from '@angular/material/input';
   selector: 'app-login-dialog',
   templateUrl: 'login-dialog.component.html',
   imports: [FormsModule, MatButtonModule, MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent, MatFormFieldModule, MatInputModule],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginDialog {
   readonly dialogRef = inject(MatDialogRef<LoginDialog>);

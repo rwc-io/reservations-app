@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, HostListener, inject, model, output } from '@angular/core';
+import {ChangeDetectionStrategy, Component, HostListener, inject, model, output} from '@angular/core';
 import {MatButton} from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
@@ -46,7 +46,6 @@ export interface ReserveDialogData {
   selector: 'app-reserve-dialog',
   templateUrl: 'reserve-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     MatDialogContent,
     MatFormField,

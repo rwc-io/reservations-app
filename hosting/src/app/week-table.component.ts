@@ -1,5 +1,5 @@
 import {Component, inject, Input, signal, WritableSignal} from '@angular/core';
-import {AsyncPipe, KeyValuePipe, NgForOf} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {
   MatCell,
   MatCellDef,
@@ -18,15 +18,7 @@ import {
 } from '@angular/material/table';
 import {ShortDate} from './utility/short-date.pipe';
 import {from, Observable, of} from 'rxjs';
-import {
-  BookableUnit,
-  Booker,
-  PricingTier,
-  ReservableWeek,
-  Reservation,
-  UnitPricing,
-  UnitPricingMap
-} from './types';
+import {BookableUnit, Booker, PricingTier, ReservableWeek, Reservation, UnitPricing, UnitPricingMap} from './types';
 import {DataService} from './data-service';
 import {MatAnchor, MatButton, MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
@@ -63,7 +55,6 @@ interface WeekReservation {
 
 @Component({
   selector: 'app-week-table',
-  standalone: true,
   imports: [
     MatTable,
     MatHeaderRowDef,
@@ -76,12 +67,10 @@ interface WeekReservation {
     MatRow,
     MatHeaderRow,
     ShortDate,
-    NgForOf,
     MatFooterCellDef,
     MatFooterCell,
     MatFooterRow,
     MatFooterRowDef,
-    KeyValuePipe,
     CurrencyPipe,
     MatIconButton,
     MatIcon,

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, HostListener, inject, model, output } from '@angular/core';
+import {ChangeDetectionStrategy, Component, HostListener, inject, model, output} from '@angular/core';
 import {MatButton} from '@angular/material/button';
 import {
   MatDialogActions,
@@ -18,7 +18,7 @@ import {MatInput, MatInputModule} from '@angular/material/input';
     <mat-dialog-content>
       <mat-form-field appearance="fill">
         <mat-label>Year</mat-label>
-        <input matInput type="number" [(ngModel)]="yearValue" (ngModelChange)="yearValue.set($event)" />
+        <input matInput type="number" [(ngModel)]="yearValue" (ngModelChange)="yearValue.set($event)"/>
       </mat-form-field>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
@@ -27,7 +27,6 @@ import {MatInput, MatInputModule} from '@angular/material/input';
     </mat-dialog-actions>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     MatDialogContent,
     MatFormField,

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, HostListener, inject, model, ModelSignal, output } from '@angular/core';
+import {ChangeDetectionStrategy, Component, HostListener, inject, model, ModelSignal, output} from '@angular/core';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
@@ -33,7 +33,6 @@ export interface EditRoundDialogData {
   selector: 'app-edit-round-dialog',
   templateUrl: 'edit-round-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     MatDialogContent,
     MatFormField,
@@ -53,7 +52,6 @@ export interface EditRoundDialogData {
     MatList,
     MatIconButton,
     MatIcon,
-
   ]
 })
 export class EditRoundDialog {
