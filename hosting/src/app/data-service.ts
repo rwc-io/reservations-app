@@ -3,7 +3,6 @@ import {BehaviorSubject, catchError, combineLatest, map, Observable, Subscriptio
 import {
   BookableUnit,
   Booker,
-  WeeksConfig,
   PricingTier,
   ReservableWeek,
   Reservation,
@@ -11,6 +10,7 @@ import {
   ReservationRoundsConfig,
   UnitPricing,
   UnitPricingMap,
+  WeeksConfig,
   YearConfig
 } from './types';
 import {
@@ -167,7 +167,7 @@ export class DataService {
     this.reservationsAuditLog$ = new BehaviorSubject([] as ReservationAuditLog[]);
     this.unitPricing$ = new BehaviorSubject({} as UnitPricingMap);
     this.weeks$ = new BehaviorSubject([] as ReservableWeek[]);
-    this.weeksConfig$ = new BehaviorSubject({ id: '', year: 1900, weeks: [] } as WeeksConfig);
+    this.weeksConfig$ = new BehaviorSubject({id: '', year: 1900, weeks: []} as WeeksConfig);
 
     let reservationRoundsConfigSubscription: Subscription;
     let reservationsAuditLogSubscription: Subscription;
@@ -227,7 +227,7 @@ export class DataService {
       const weeksQuery = query(weeksCollection, where('year', '==', year), limit(1));
       weeksSubscription = collectionData(weeksQuery).subscribe((it) => {
         if (it.length === 0) {
-          this.weeksConfig$.next({ id: '', year, weeks: [] } as WeeksConfig);
+          this.weeksConfig$.next({id: '', year, weeks: []} as WeeksConfig);
           this.weeks$.next([] as ReservableWeek[]);
         } else {
           const configData = it[0] as WeeksConfig;
@@ -308,7 +308,7 @@ export class DataService {
     const weeksCollection = collection(this.firestore, 'weeks');
     if (config.id) {
       const existingRef = doc(weeksCollection, config.id);
-      return updateDoc(existingRef, { ...config });
+      return updateDoc(existingRef, {...config});
     } else {
       return addDoc(weeksCollection, config);
     }
