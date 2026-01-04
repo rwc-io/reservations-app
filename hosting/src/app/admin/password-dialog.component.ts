@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, HostListener, inject, model } from '@angular/core';
+import {ChangeDetectionStrategy, Component, HostListener, inject, model} from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -16,7 +16,6 @@ import {FormsModule} from '@angular/forms';
   selector: 'app-password-dialog',
   templateUrl: 'password-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     MatDialogTitle,
     MatDialogContent,

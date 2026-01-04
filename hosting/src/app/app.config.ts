@@ -52,11 +52,11 @@ export const appConfig: ApplicationConfig = {
       return firestore;
     }),
     provideFunctions(() => {
-        const functions = getFunctions();
-        if (environment.useEmulators) {
-          connectFunctionsEmulator(functions, 'localhost', 5001);
-        }
-        return functions;
+      const functions = getFunctions();
+      if (environment.useEmulators) {
+        connectFunctionsEmulator(functions, 'localhost', 5001);
+      }
+      return functions;
     }),
     provideStorage(() => {
       const storage = getStorage();

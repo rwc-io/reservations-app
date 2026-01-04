@@ -1,4 +1,4 @@
-import { Component, model, OnDestroy, inject } from '@angular/core';
+import {Component, inject, model, OnDestroy} from '@angular/core';
 import {AuthComponent} from '../auth/auth.component';
 import {ActivatedRoute, ActivationEnd, Router, RouterLink, RouterOutlet} from '@angular/router';
 import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-toggle';
@@ -12,7 +12,6 @@ import {YearSelectorComponent} from '../utility/year-selector.component';
 
 @Component({
   selector: 'app-admin',
-  standalone: true,
   imports: [
     AuthComponent,
     RouterOutlet,
@@ -24,7 +23,7 @@ import {YearSelectorComponent} from '../utility/year-selector.component';
     YearSelectorComponent,
   ],
   templateUrl: './admin.component.html',
-  styleUrl: './admin.component.css',
+  styleUrl: './admin.component.css'
 })
 export class AdminComponent implements OnDestroy {
   private router = inject(Router);

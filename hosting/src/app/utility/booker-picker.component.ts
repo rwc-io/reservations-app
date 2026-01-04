@@ -13,17 +13,14 @@ import {
 import {FormsModule} from '@angular/forms';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {Booker} from '../types';
-import {NgForOf} from '@angular/common';
 import {MatOption, MatSelect} from '@angular/material/select';
 
 @Component({
   selector: 'app-booker-picker',
   templateUrl: 'booker-picker.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     MatFormField,
-    NgForOf,
     FormsModule,
     MatLabel,
     MatSelect,

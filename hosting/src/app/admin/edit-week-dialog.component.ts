@@ -45,7 +45,6 @@ export interface EditWeekDialogResult {
   selector: 'app-edit-week-dialog',
   templateUrl: 'edit-week-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     MatDialogContent,
     MatDialogActions,
@@ -66,7 +65,7 @@ export interface EditWeekDialogResult {
     MatDatepickerToggle,
     MatLuxonDateModule,
     AsyncPipe,
-  ],
+  ]
 })
 export class EditWeekDialog {
   data = inject<EditWeekDialogData>(MAT_DIALOG_DATA);

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -12,7 +12,6 @@ import {MatButton} from '@angular/material/button';
   selector: 'app-error-dialog',
   templateUrl: 'error-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     MatDialogClose,
     MatButton,

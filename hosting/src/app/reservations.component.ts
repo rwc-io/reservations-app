@@ -40,7 +40,6 @@ import {YearSelectorComponent} from './utility/year-selector.component';
 
 @Component({
   selector: 'app-reservations',
-  standalone: true,
   imports: [
     AsyncPipe,
     AuthComponent,
@@ -63,7 +62,7 @@ import {YearSelectorComponent} from './utility/year-selector.component';
     YearSelectorComponent,
   ],
   templateUrl: './reservations.component.html',
-  styleUrl: './reservations.component.css',
+  styleUrl: './reservations.component.css'
 })
 export class ReservationsComponent implements OnDestroy {
   private readonly auth = inject(Auth);

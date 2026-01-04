@@ -9,7 +9,6 @@ import {AddYearDialog} from '../admin/add-year-dialog.component';
 
 @Component({
   selector: 'app-year-selector',
-  standalone: true,
   imports: [
     FormsModule,
     MatFormField,
@@ -31,7 +30,7 @@ import {AddYearDialog} from '../admin/add-year-dialog.component';
         }
       </mat-select>
     </mat-form-field>
-  `,
+  `
 })
 export class YearSelectorComponent {
   @Input() label = 'Viewing year';

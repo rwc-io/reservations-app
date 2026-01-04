@@ -10,7 +10,6 @@ import {TodayService} from './today-service';
   selector: 'app-today-picker',
   templateUrl: 'today-picker.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     FormsModule,
     MatDatepicker,

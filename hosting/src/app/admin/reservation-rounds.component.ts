@@ -29,7 +29,6 @@ import {EditRoundDialog, EditRoundDialogData} from './edit-round-dialog.componen
 
 @Component({
   selector: 'app-reservation-rounds-admin',
-  standalone: true,
   imports: [
     MatCard,
     MatCardHeader,
@@ -51,7 +50,7 @@ import {EditRoundDialog, EditRoundDialogData} from './edit-round-dialog.componen
   templateUrl: './reservation-rounds.component.html',
   host: {
     'class': 'admin-component-contents'
-  }
+  },
 })
 export class ReservationRoundsComponent implements OnDestroy {
   private route = inject(ActivatedRoute);

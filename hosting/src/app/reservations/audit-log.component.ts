@@ -21,7 +21,6 @@ import {MatAccordion, MatExpansionPanel, MatExpansionPanelHeader} from '@angular
   selector: 'app-audit-log',
   templateUrl: 'audit-log.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     MatList,
     MatListItem,

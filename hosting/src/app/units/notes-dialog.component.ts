@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, HostListener, inject, SecurityContext } from '@angular/core';
+import {ChangeDetectionStrategy, Component, HostListener, inject, SecurityContext} from '@angular/core';
 import {MatButton} from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
@@ -22,7 +22,6 @@ export interface NotesDialogData {
   selector: 'app-notes-dialog',
   templateUrl: 'notes-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     MatDialogContent,
     MatDialogActions,
@@ -31,7 +30,6 @@ export interface NotesDialogData {
     MatDialogTitle,
     FormsModule,
     MatInputModule,
-
   ]
 })
 export class NotesDialog {

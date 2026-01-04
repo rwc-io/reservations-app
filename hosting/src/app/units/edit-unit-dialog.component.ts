@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, HostListener, inject, model, output } from '@angular/core';
+import {ChangeDetectionStrategy, Component, HostListener, inject, model, output} from '@angular/core';
 import {MatButton} from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
@@ -29,7 +29,6 @@ export interface EditUnitDialogData {
   selector: 'app-edit-unit-dialog',
   templateUrl: 'edit-unit-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     MatDialogContent,
     MatFormField,
