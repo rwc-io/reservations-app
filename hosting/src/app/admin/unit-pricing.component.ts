@@ -10,11 +10,19 @@ import {toSignal} from '@angular/core/rxjs-interop';
 import {ActivatedRoute} from '@angular/router';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatOption, MatSelect} from '@angular/material/select';
-import {NgForOf} from '@angular/common';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatInput} from '@angular/material/input';
 import {MatButton} from '@angular/material/button';
+import {MatTableModule} from '@angular/material/table';
+import {MatDivider} from '@angular/material/divider';
+import {MatExpansionModule} from '@angular/material/expansion';
 import {ErrorDialog} from '../utility/error-dialog.component';
+import {CopyPricingDialog} from './copy-pricing-dialog.component';
+
+interface UnitPricingRow {
+  unitName: string;
+  prices: Record<string, number>;
+}
 
 @Component({
   selector: 'app-unit-pricing',
@@ -26,15 +34,20 @@ import {ErrorDialog} from '../utility/error-dialog.component';
     MatFormField,
     MatSelect,
     MatOption,
-    NgForOf,
     FormsModule,
     MatInput,
     MatLabel,
     ReactiveFormsModule,
     MatCardActions,
     MatButton,
+    MatTableModule,
+    MatDivider,
+    MatExpansionModule,
   ],
   templateUrl: './unit-pricing.component.html',
+  host: {
+    'class': 'admin-component-contents'
+  }
 })
 export class UnitPricingComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
@@ -45,11 +58,37 @@ export class UnitPricingComponent implements OnInit, OnDestroy {
   private readonly storage = inject(Storage);
 
   year = this.dataService.activeYear
+  availableYears = this.dataService.availableYearsSig;
   selectedUnitId = signal('');
   units = this.dataService.units;
   allPricings = toSignal(this.dataService.unitPricing$, {initialValue: {} as UnitPricingMap});
   tiers = toSignal(this.dataService.pricingTiers$, {initialValue: [] as PricingTier[]});
   tierIds = computed(() => this.tiers().map(t => t.id))
+
+  dataSource = computed(() => {
+    const units = this.units();
+    const allPricings = this.allPricings();
+    const tiers = this.tiers();
+
+    return units.map(unit => {
+      const pricing = allPricings[unit.id] || [];
+      const row: UnitPricingRow = {
+        unitName: unit.name,
+        prices: {}
+      };
+
+      tiers.forEach(tier => {
+        const p = pricing.find(x => x.tierId === tier.id);
+        row.prices[tier.id] = p?.weeklyPrice ?? p?.dailyPrice ?? 0;
+      });
+
+      return row;
+    });
+  });
+
+  displayedColumns = computed(() => {
+    return ['unitName', ...this.tierIds()];
+  });
 
   unit = computed(() => {
     return this.units().find(unit => unit.id === this.selectedUnitId())
@@ -89,6 +128,29 @@ export class UnitPricingComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.paramSubscription?.unsubscribe();
+  }
+
+  onCopyFrom() {
+    const availableYears = this.availableYears().filter(y => y !== this.year());
+
+    const dialogRef = this.dialog.open(CopyPricingDialog, {
+      data: {
+        activeYear: this.year(),
+        availableYears,
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(fromYear => {
+      if (fromYear) {
+        this.dataService.copyUnitPricing(fromYear, this.year()).then(() => {
+          this.snackBar.open('Pricing copied', 'Ok', {
+            duration: 3000
+          });
+        }).catch(error => {
+          this.dialog.open(ErrorDialog, {data: `Couldn't copy pricing: ${error.message}`});
+        });
+      }
+    });
   }
 
   onSubmit() {

@@ -23,6 +23,9 @@ import {Auth, updatePassword} from '@angular/fire/auth';
     MatIcon,
   ],
   templateUrl: './passwords.component.html',
+  host: {
+    'class': 'admin-component-contents'
+  }
 })
 export class PasswordsComponent {
   private readonly auth = inject(Auth);

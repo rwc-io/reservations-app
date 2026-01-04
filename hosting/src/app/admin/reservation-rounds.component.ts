@@ -49,6 +49,9 @@ import {EditRoundDialog, EditRoundDialogData} from './edit-round-dialog.componen
     RoundConfigComponent,
   ],
   templateUrl: './reservation-rounds.component.html',
+  host: {
+    'class': 'admin-component-contents'
+  }
 })
 export class ReservationRoundsComponent implements OnDestroy {
   private route = inject(ActivatedRoute);
