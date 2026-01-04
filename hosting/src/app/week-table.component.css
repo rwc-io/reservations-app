@@ -26,3 +26,8 @@ th.unit-header {
   padding-bottom: 0.75em;
   vertical-align: top;
 }
+
+.mat-no-data-cell {
+  padding: 30px;
+  text-align: center;
+}
