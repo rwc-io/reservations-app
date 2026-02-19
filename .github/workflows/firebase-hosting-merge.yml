@@ -28,6 +28,7 @@ jobs:
           ./write-app-config.sh
           cat ./src/app/reservations-app.config.json
         env:
+          APPLICATION_TITLE: ${{ vars.APPLICATION_TITLE }}
           FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
           FIREBASE_APP_ID: ${{ vars.FIREBASE_APP_ID }}
           FIREBASE_STORAGE_BUCKET: ${{ vars.FIREBASE_STORAGE_BUCKET }}
