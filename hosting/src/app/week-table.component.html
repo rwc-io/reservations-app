@@ -125,7 +125,7 @@
   </tr>
   <tr class="mat-row" *matNoDataRow>
     <td class="mat-cell" class="weeks-content" [attr.colspan]="displayedColumns.length">
-      <h2>No weeks configured for reservation.</h2>
+      <h2>No reservable weeks configured for {{activeYear()}}.</h2>
     </td>
   </tr>
   <tr mat-footer-row class="pricing-footer" *matFooterRowDef="displayedColumns"></tr>

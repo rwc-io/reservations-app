@@ -315,20 +315,20 @@ export class DataService {
   }
 
   updateAnnualDocumentFilename(year: number, filename: string) {
-    const weeksCollection = collection(this.firestore, 'weeks');
-    const weeksQuery = query(weeksCollection, where('year', '==', year), limit(1));
+    const yearsCollection = collection(this.firestore, 'years');
+    const yearsQuery = query(yearsCollection, where('year', '==', year), limit(1));
 
     return new Promise((resolve, reject) => {
-      const subscription = collectionSnapshots(weeksQuery).subscribe((snapshots) => {
+      const subscription = collectionSnapshots(yearsQuery).subscribe((snapshots) => {
         subscription.unsubscribe();
 
         if (snapshots.length === 0) {
-          console.error(`Annual config not found for year ${year}`)
+          console.error(`YearConfig not found for year ${year}`)
           return;
         }
 
-        const doc = snapshots[0];
-        updateDoc(doc.ref, {annualDocumentFilename: filename}).then(() => {
+        const docSnapshot = snapshots[0];
+        updateDoc(docSnapshot.ref, {annualDocumentFilename: filename}).then(() => {
           resolve(true);
         }).catch((error) => {
           reject(error);
