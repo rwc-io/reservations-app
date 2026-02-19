@@ -1,4 +1,4 @@
-import {Component, inject, Input, signal, WritableSignal} from '@angular/core';
+import {Component, computed, inject, Input, Signal, signal, WritableSignal} from '@angular/core';
 import {AsyncPipe} from '@angular/common';
 import {
   MatCell,
@@ -109,9 +109,9 @@ export class WeekTableComponent {
   // Download URLs are generated asynchronously
   protected downloadUrls: Record<string, Observable<string>> = {};
 
-  // Main table fields
   tableRows$: Observable<WeekRow[]> = of([])
   displayedColumns: string[] = [];
+  activeYear: Signal<number> = computed(() => this.dataService.activeYear());
 
   buildTableRows() {
     const weeks = this._weeks;
