@@ -28,3 +28,8 @@ th.unit-header {
   padding: 30px;
   text-align: center;
 }
+
+.unit-name {
+  padding: 0 12px;
+  display: inline-block;
+}
