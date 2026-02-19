@@ -14,18 +14,14 @@
   @for (unit of units; track unit.id) {
     <ng-container [matColumnDef]="unit.name">
       <th class="unit-header" mat-header-cell *matHeaderCellDef>
-        @if (canEditUnit()) {
-          <div class="mat-button-small" class="edit-unit">
-            <button mat-icon-button aria-label="Edit unit" (click)="editUnit(unit)">
-              <mat-icon>edit</mat-icon>
-            </button>
-          </div>
-        }
         <div class="unit-header">
-          <div>{{ unit.name }}</div>
+          <div>
+            <mat-icon class="vertical-middle">gite</mat-icon>
+            <span class="vertical-middle">{{ unit.name }}</span>
+          </div>
           @if (unit.floorPlanFilename) {
             <div>
-              <mat-icon class="vertical-middle">gite</mat-icon>
+              <mat-icon class="vertical-middle">map</mat-icon>
               <a mat-button href="{{downloadUrls[unit.id] | async}}" target="_blank">Floor plan</a>
             </div>
           }
@@ -33,6 +29,14 @@
             <div>
               <mat-icon class="vertical-middle">description</mat-icon>
               <button mat-button class="vertical-middle" (click)="openNotesDialog(unit)">Notes</button>
+            </div>
+          }
+          @if (canEditUnit()) {
+            <div>
+              <mat-icon class="vertical-middle">edit</mat-icon>
+              <button mat-button class="vertical-middle" aria-label="Edit unit" (click)="editUnit(unit)">
+                Manage
+              </button>
             </div>
           }
         </div>

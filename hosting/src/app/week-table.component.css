@@ -8,13 +8,9 @@
   text-align: center;
 }
 
-div.edit-unit {
-  display: inline-block;
-  vertical-align: top;
-}
-
 div.unit-header {
   display: inline-block;
+  text-align: left;
 }
 
 table {
@@ -25,6 +21,7 @@ th.unit-header {
   padding-top: 0.75em;
   padding-bottom: 0.75em;
   vertical-align: top;
+  text-align: center;
 }
 
 .mat-no-data-cell {
