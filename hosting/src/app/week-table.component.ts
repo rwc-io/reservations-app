@@ -88,7 +88,7 @@ interface WeekReservation {
     MatNoDataRow,
   ],
   templateUrl: './week-table.component.html',
-  styleUrl: './week-table.component.css'
+  styleUrl: './week-table.component.scss'
 })
 export class WeekTableComponent {
   private readonly auth = inject(Auth);

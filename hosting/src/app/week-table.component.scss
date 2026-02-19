@@ -1,6 +1,8 @@
+@use '../media_sizes' as media;
+
 .pricing-footer {
-  @media only screen and (max-width: 768px) {
-    display: none;
+  @media only screen and (max-width: media.$sm) {
+    /*display: none;*/
   }
 }
 
