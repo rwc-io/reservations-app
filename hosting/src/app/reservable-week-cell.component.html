@@ -1,0 +1,60 @@
+@if (isReservedByDay(unitReservations)) {
+  <mat-accordion>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        Reserved by the day
+      </mat-expansion-panel-header>
+      <mat-list>
+        @for (day of weekDates(weekRow); track $index) {
+          <mat-list-item>
+            @let reservation = reservationForDay(unitReservations, day);
+            <span matListItemTitle>
+              <span>{{ day | shortDate }}</span>
+              @if (!!reservation && canEditReservation(reservation)) {
+                <span style="float: right">
+                  <button mat-icon-button aria-label="Edit reservation"
+                          (click)="onEditReservation(reservation)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                </span>
+              }
+              @if (!reservation && canAddDailyReservation) {
+                <div class="add-button" style="float: right">
+                  <button mat-icon-button aria-label="Add reservation"
+                          (click)="onAddReservation(day, day.plus({days: 1}))">
+                    <mat-icon class="material-icons-outlined">add_box</mat-icon>
+                </button>
+                </div>
+              }
+            </span>
+            <span matListItemLine>{{ reservation?.guestName }}</span>
+            <span>{{ bookerName(reservation?.bookerId || "") || '' }}</span>
+          </mat-list-item>
+        }
+      </mat-list>
+    </mat-expansion-panel>
+  </mat-accordion>
+} @else if (unitReservations?.length === 1) {
+  @let reservation = unitReservations[0];
+  <div>
+  <span>
+    {{ reservation.guestName }} ({{ bookerName(reservation.bookerId) || 'unknown' }})
+  </span>
+    @if (canEditReservation(reservation)) {
+      <span class="mat-button-small" style="float: left">
+      <button mat-icon-button aria-label="Edit reservation" (click)="onEditReservation(reservation)">
+        <mat-icon>edit</mat-icon>
+      </button>
+    </span>
+    }
+  </div>
+} @else {
+  @if (canAddReservation) {
+    <div class="add-button">
+      <button mat-icon-button aria-label="Add reservation"
+              (click)="onAddReservation(weekRow.startDate, weekRow.endDate)">
+        <mat-icon class="material-icons-outlined">add_box</mat-icon>
+      </button>
+    </div>
+  }
+}
