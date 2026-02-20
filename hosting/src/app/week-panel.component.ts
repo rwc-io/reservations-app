@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {BookableUnit, Booker, UnitPricingMap} from './types';
+import {BookableUnit, UnitPricingMap} from './types';
 import {WeekReservation, WeekRow} from './week-table.component';
 import {DateTime} from 'luxon';
 import {ReservableWeekCardComponent} from './reservable-week-card.component';
@@ -15,7 +15,6 @@ import {ReservableWeekCardComponent} from './reservable-week-card.component';
       <app-reservable-week-card
         [unit]="unit"
         [weekRow]="weekRow"
-        [bookers]="bookers"
         [unitPricing]="unitPricing"
         [canAddReservation]="canAddReservation"
         [canAddDailyReservation]="canAddDailyReservation"
@@ -29,7 +28,6 @@ import {ReservableWeekCardComponent} from './reservable-week-card.component';
 export class WeekPanelComponent {
   @Input({required: true}) weekRow!: WeekRow;
   @Input({required: true}) units!: BookableUnit[];
-  @Input({required: true}) bookers!: Booker[];
   @Input({required: true}) unitPricing!: UnitPricingMap;
   @Input({required: true}) canAddReservation!: boolean;
   @Input({required: true}) canAddDailyReservation!: boolean;

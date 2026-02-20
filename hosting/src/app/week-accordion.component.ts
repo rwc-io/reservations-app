@@ -1,4 +1,4 @@
-import {Component, computed, inject, Input, signal, Signal, WritableSignal} from '@angular/core';
+import {Component, computed, inject, Input, Signal} from '@angular/core';
 import {AsyncPipe} from '@angular/common';
 import {
   MatAccordion,
@@ -17,12 +17,11 @@ import {MatDialog} from '@angular/material/dialog';
 import {DateTime} from 'luxon';
 import {ANIMATION_SETTINGS} from './app.config';
 import {ErrorDialog} from './utility/error-dialog.component';
-import {Auth} from '@angular/fire/auth';
-import {ReservationRoundsService} from './reservations/reservation-rounds-service';
 import {WeekReservation, WeekRow} from './week-table.component';
 import {WeekPanelComponent} from './week-panel.component';
 import {ReserveDialog, ReserveDialogData} from './reservations/reserve-dialog.component';
 import {CurrencyPipe} from './utility/currency-pipe';
+import {PermissionsService} from './reservations/permissions-service';
 
 @Component({
   selector: 'app-week-accordion',
@@ -46,13 +45,12 @@ import {CurrencyPipe} from './utility/currency-pipe';
         <mat-expansion-panel>
           <mat-expansion-panel-header>
             <mat-panel-title>
-              {{ row.startDate | shortDate }} – {{ row.endDate | shortDate }}: {{ row.pricingTier.name || '' }}
+              {{ row.startDate | shortDate }} – {{ row.endDate | shortDate }}: {{ row.pricingTier?.name || '' }}
             </mat-panel-title>
           </mat-expansion-panel-header>
           <app-week-panel
             [weekRow]="row"
             [units]="units"
-            [bookers]="bookers"
             [unitPricing]="unitPricing"
             [canAddReservation]="canAddReservation()"
             [canAddDailyReservation]="canAddDailyReservation()"
@@ -94,28 +92,13 @@ import {CurrencyPipe} from './utility/currency-pipe';
       }
     </mat-accordion>
   `,
-  styles: [`
-    .no-data {
-      padding: 30px;
-      text-align: center;
-    }
-
-    .pricing-cards {
-      display: flex;
-      flex-direction: column;
-      gap: 1em;
-      padding: 1em 0;
-    }
-  `]
 })
 export class WeekAccordionComponent {
-  private readonly auth = inject(Auth);
   private readonly dataService = inject(DataService);
   private readonly dialog = inject(MatDialog);
-  private readonly reservationsRoundsService = inject(ReservationRoundsService);
+  private readonly permissionsService = inject(PermissionsService);
 
-  private _bookers: WritableSignal<Booker[]> = signal([]);
-  private _currentBooker: WritableSignal<Booker | undefined> = signal(undefined);
+  private _currentBooker: Signal<Booker | undefined> = this.permissionsService.currentBooker;
   private _reservations: Reservation[] = [];
   private _pricingTiers: PricingTier[] = [];
   private _units: BookableUnit[] = [];
@@ -124,20 +107,6 @@ export class WeekAccordionComponent {
 
   tableRows$: Observable<WeekRow[]> = of([])
   activeYear: Signal<number> = computed(() => this.dataService.activeYear());
-
-  @Input() set bookers(value: Booker[]) {
-    this._bookers.set(value);
-    this.buildTableRows();
-  }
-
-  get bookers() {
-    return this._bookers();
-  }
-
-  @Input() set currentBooker(value: Booker | undefined) {
-    this._currentBooker.set(value);
-    this.buildTableRows();
-  }
 
   @Input() set units(value: BookableUnit[]) {
     this._units = value;
@@ -268,7 +237,7 @@ export class WeekAccordionComponent {
         existingReservationId: existingReservation?.id,
         allowDailyReservations: this.canAddDailyReservation(),
         blockedDates: this.blockedDaysFor(reservationsForUnit, existingReservation),
-        canDelete: !!existingReservation && this.canEditReservation(existingReservation)
+        canDelete: !!existingReservation && this.canDeleteReservation(existingReservation)
       } as ReserveDialogData,
       ...ANIMATION_SETTINGS
     });
@@ -290,35 +259,27 @@ export class WeekAccordionComponent {
 
   availableBookers(): Booker[] {
     const currentBooker = this._currentBooker();
-    if (this.actingAsAdmin()) {
-      return this.bookers;
+    if (this.permissionsService.actingAsAdmin()) {
+      return this.dataService.bookers();
     }
-    return this.bookers.filter(booker => booker.id === currentBooker?.id);
+    return this.dataService.bookers().filter(booker => booker.id === currentBooker?.id);
   }
 
-  actingAsAdmin(): boolean {
-    return this.dataService.isAdmin() && !!this._currentBooker() && this._currentBooker()?.userId !== this.auth.currentUser?.uid;
-  }
 
   canAddReservation(): boolean {
-    const currentRound = this.reservationsRoundsService.currentRound();
-    if (!currentRound) return this.dataService.isAdmin();
-    const currentBooker = this._currentBooker();
-    if (!currentBooker) return false;
-    const isOurRound = !currentRound.subRoundBookerIds || currentRound.subRoundBookerIds.length === 0 || currentRound.subRoundBookerIds.includes(currentBooker.id);
-    if (!isOurRound) return false;
-    const bookedWeeks = this._reservations.filter(reservation => reservation.bookerId === currentBooker?.id).length;
-    return bookedWeeks < currentRound.bookedWeeksLimit;
+    return this.permissionsService.canAddReservation(this._reservations);
   }
 
   canAddDailyReservation(): boolean {
-    return this.reservationsRoundsService.currentRound()?.allowDailyReservations || this.dataService.isAdmin();
+    return this.permissionsService.canAddDailyReservation(this._reservations);
   }
 
   canEditReservation(reservation: WeekReservation): boolean {
-    const currentRound = this.reservationsRoundsService.currentRound();
-    if (!currentRound) return this.dataService.isAdmin();
-    return (this.dataService.isAdmin() || reservation.bookerId === this._currentBooker()?.id);
+    return this.permissionsService.canEditReservation(reservation);
+  }
+
+  canDeleteReservation(reservation: WeekReservation): boolean {
+    return this.permissionsService.canDeleteReservation(reservation);
   }
 
   editReservation(reservation: WeekReservation, week: WeekRow) {

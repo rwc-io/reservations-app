@@ -2,18 +2,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  Input,
-  model,
-  OnDestroy,
-  output,
-  OutputRefSubscription,
-  Signal,
-  signal,
+  inject,
 } from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
-import {Booker} from '../types';
 import {MatOption, MatSelect} from '@angular/material/select';
+import {DataService} from '../data-service';
+import {PermissionsService} from '../reservations/permissions-service';
 
 @Component({
   selector: 'app-booker-picker',
@@ -27,25 +22,21 @@ import {MatOption, MatSelect} from '@angular/material/select';
     MatOption,
   ]
 })
-export class BookerPickerComponent implements OnDestroy {
-  bookerId = output<string>();
-  _bookerId = model('');
-  @Input()
-  bookers: Signal<Booker[]> = signal([]);
+export class BookerPickerComponent {
+  private readonly dataService = inject(DataService);
+  private readonly permissionsService = inject(PermissionsService);
+
+  bookers = this.dataService.bookers;
 
   sortedBookers = computed(() => {
-    return this.bookers().sort((a, b) => a.name.localeCompare(b.name));
+    return [...this.bookers()].sort((a, b) => a.name.localeCompare(b.name));
   });
 
-  bookerSubscription?: OutputRefSubscription;
-
-  constructor() {
-    this.bookerSubscription = this._bookerId.subscribe(id => {
-      this.bookerId.emit(id);
-    })
+  get bookerIdOverride() {
+    return this.permissionsService.bookerIdOverride();
   }
 
-  ngOnDestroy() {
-    this.bookerSubscription?.unsubscribe();
+  set bookerIdOverride(id: string) {
+    this.permissionsService.bookerIdOverride.set(id);
   }
 }

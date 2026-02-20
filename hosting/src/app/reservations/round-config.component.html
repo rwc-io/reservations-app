@@ -1,6 +1,6 @@
 <div class="round-config">
   <ul>
-    @for (round of rounds(); track round) {
+    @for (round of rounds(); track round.startDate) {
       <li>
         Round {{ round.name }}: {{ round.startDate | shortDate }} – {{ round.endDate | shortDate }}
         <ul>
