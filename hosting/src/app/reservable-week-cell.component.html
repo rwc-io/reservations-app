@@ -38,16 +38,17 @@
   @let reservation = unitReservations[0];
   <div class="reservation-container">
     <mat-chip-set>
-      <mat-chip>
-        {{ reservation.guestName || 'Unknown guest' }}
-      </mat-chip>
-      <mat-chip>
-        {{ bookerName(reservation.bookerId) || 'Unknown group' }}
-      </mat-chip>
       @if (canEditReservation(reservation)) {
         <mat-chip (click)="onEditReservation(reservation)" style="cursor: pointer">
           <mat-icon matChipTrailingIcon>edit</mat-icon>
-          Edit
+          {{ reservation.guestName || 'Unknown guest' }}
+          ({{ bookerName(reservation.bookerId) || 'Unknown group' }})
+        </mat-chip>
+      } @else {
+        <mat-chip>
+          <mat-icon matChipTrailingIcon>event</mat-icon>
+          {{ reservation.guestName || 'Unknown guest' }}
+          ({{ bookerName(reservation.bookerId) || 'Unknown group' }})
         </mat-chip>
       }
     </mat-chip-set>

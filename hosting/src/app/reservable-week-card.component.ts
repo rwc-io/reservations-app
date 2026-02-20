@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {BookableUnit, Booker, UnitPricingMap} from './types';
+import {BookableUnit, Booker, PricingTier, UnitPricingMap} from './types';
 import {WeekReservation, WeekRow} from './week-table.component';
 import {DateTime} from 'luxon';
 import {ReservableWeekCellComponent} from './reservable-week-cell.component';
@@ -60,7 +60,7 @@ export class ReservableWeekCardComponent {
   @Output() addReservation = new EventEmitter<{ startDate: DateTime; endDate: DateTime }>();
   @Output() editReservation = new EventEmitter<WeekReservation>();
 
-  unitTierPricing(unit: BookableUnit, pricingTier: any) {
+  unitTierPricing(unit: BookableUnit, pricingTier: PricingTier) {
     return this.unitPricing[unit.id]?.find(it => it.tierId === pricingTier.id);
   }
 }

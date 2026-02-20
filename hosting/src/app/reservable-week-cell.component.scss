@@ -6,4 +6,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
+  column-gap: 0.5em;
+
+  mat-chip-set {
+    display: flex;
+    justify-content: center;
+  }
 }
