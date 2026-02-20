@@ -8,6 +8,7 @@ import {FormsModule} from '@angular/forms';
 import {MatButton} from '@angular/material/button';
 import {DataService} from '../data-service';
 import {YearSelectorComponent} from '../utility/year-selector.component';
+import reservationsAppConfig from '../reservations-app.config.json';
 
 
 @Component({
@@ -30,7 +31,7 @@ export class AdminComponent implements OnDestroy {
   private route = inject(ActivatedRoute);
   protected dataService = inject(DataService);
 
-  title = 'Reservations-App';
+  title = reservationsAppConfig.applicationTitle;
 
   activeChild = model('');
   activeChildSubscription: Subscription;
