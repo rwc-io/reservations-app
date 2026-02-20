@@ -1,5 +1,5 @@
 import {Component, computed, inject, Input, signal, Signal, WritableSignal} from '@angular/core';
-import {AsyncPipe, CurrencyPipe} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {
   MatAccordion,
   MatExpansionPanel,
@@ -8,6 +8,7 @@ import {
 } from '@angular/material/expansion';
 import {MatListModule} from '@angular/material/list';
 import {MatCardModule} from '@angular/material/card';
+import {MatChipsModule} from '@angular/material/chips';
 import {ShortDate} from './utility/short-date.pipe';
 import {Observable, of} from 'rxjs';
 import {BookableUnit, Booker, PricingTier, ReservableWeek, Reservation, UnitPricingMap} from './types';
@@ -21,6 +22,7 @@ import {ReservationRoundsService} from './reservations/reservation-rounds-servic
 import {WeekReservation, WeekRow} from './week-table.component';
 import {WeekPanelComponent} from './week-panel.component';
 import {ReserveDialog, ReserveDialogData} from './reservations/reserve-dialog.component';
+import {CurrencyPipe} from './utility/currency-pipe';
 
 @Component({
   selector: 'app-week-accordion',
@@ -35,6 +37,8 @@ import {ReserveDialog, ReserveDialogData} from './reservations/reserve-dialog.co
     WeekPanelComponent,
     MatListModule,
     MatCardModule,
+    MatChipsModule,
+    CurrencyPipe,
   ],
   template: `
     <mat-accordion>
@@ -75,7 +79,13 @@ import {ReserveDialog, ReserveDialogData} from './reservations/reserve-dialog.co
                   <mat-card-title>{{ unit.name }}</mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
-                  {{ getUnitPricingString(unit) }}
+                  <mat-chip-set>
+                    @for (pricing of getUnitPricing(unit); track pricing.tierId) {
+                      <mat-chip>
+                        {{ pricing.tierName }} {{ pricing.weeklyPrice | currency }}
+                      </mat-chip>
+                    }
+                  </mat-chip-set>
                 </mat-card-content>
               </mat-card>
             }
@@ -89,6 +99,7 @@ import {ReserveDialog, ReserveDialogData} from './reservations/reserve-dialog.co
       padding: 30px;
       text-align: center;
     }
+
     .pricing-cards {
       display: flex;
       flex-direction: column;
@@ -209,24 +220,22 @@ export class WeekAccordionComponent {
     );
   }
 
-  getUnitPricingString(unit: BookableUnit): string {
+  getUnitPricing(unit: BookableUnit) {
     const pricing = this._unitPricing[unit.id] || [];
     const pricingTiersById: Record<string, PricingTier> = this._pricingTiers.reduce((acc, t) => {
       acc[t.id] = t;
       return acc;
     }, {} as Record<string, PricingTier>);
 
-    const currencyPipe = new CurrencyPipe('en-US');
     return pricing
       .slice()
       .sort((a, b) => b.weeklyPrice - a.weeklyPrice)
-      .map(p => {
-        const tierName = pricingTiersById[p.tierId]?.name || 'Unknown';
-        const cost = currencyPipe.transform(p.weeklyPrice, 'USD', 'symbol', '1.0-0');
-        return `${tierName} ${cost}`;
-      })
-      .join(', ');
+      .map(p => ({
+        ...p,
+        tierName: pricingTiersById[p.tierId]?.name || 'Unknown'
+      }));
   }
+
 
   addReservation(weekRow: WeekRow, unit: BookableUnit, startDate: DateTime, endDate: DateTime) {
     const dialogRef = this.openReserveDialog(unit, weekRow, startDate, endDate);
