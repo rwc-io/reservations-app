@@ -36,17 +36,21 @@
   </mat-accordion>
 } @else if (unitReservations?.length === 1) {
   @let reservation = unitReservations[0];
-  <div>
-  <span>
-    {{ reservation.guestName }} ({{ bookerName(reservation.bookerId) || 'unknown' }})
-  </span>
-    @if (canEditReservation(reservation)) {
-      <span class="mat-button-small" style="float: left">
-      <button mat-icon-button aria-label="Edit reservation" (click)="onEditReservation(reservation)">
-        <mat-icon>edit</mat-icon>
-      </button>
-    </span>
-    }
+  <div class="reservation-container">
+    <mat-chip-set>
+      <mat-chip>
+        {{ reservation.guestName || 'Unknown guest' }}
+      </mat-chip>
+      <mat-chip>
+        {{ bookerName(reservation.bookerId) || 'Unknown group' }}
+      </mat-chip>
+      @if (canEditReservation(reservation)) {
+        <mat-chip (click)="onEditReservation(reservation)" style="cursor: pointer">
+          <mat-icon matChipTrailingIcon>edit</mat-icon>
+          Edit
+        </mat-chip>
+      }
+    </mat-chip-set>
   </div>
 } @else {
   @if (canAddReservation) {
