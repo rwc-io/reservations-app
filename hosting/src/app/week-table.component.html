@@ -14,18 +14,14 @@
   @for (unit of units; track unit.id) {
     <ng-container [matColumnDef]="unit.name">
       <th class="unit-header" mat-header-cell *matHeaderCellDef>
-        @if (canEditUnit()) {
-          <div class="mat-button-small" class="edit-unit">
-            <button mat-icon-button aria-label="Edit unit" (click)="editUnit(unit)">
-              <mat-icon>edit</mat-icon>
-            </button>
-          </div>
-        }
         <div class="unit-header">
-          <div>{{ unit.name }}</div>
+          <div>
+            <mat-icon class="vertical-middle">gite</mat-icon>
+            <div class="vertical-middle unit-name">{{ unit.name }}</div>
+          </div>
           @if (unit.floorPlanFilename) {
             <div>
-              <mat-icon class="vertical-middle">gite</mat-icon>
+              <mat-icon class="vertical-middle">map</mat-icon>
               <a mat-button href="{{downloadUrls[unit.id] | async}}" target="_blank">Floor plan</a>
             </div>
           }
@@ -35,71 +31,28 @@
               <button mat-button class="vertical-middle" (click)="openNotesDialog(unit)">Notes</button>
             </div>
           }
-        </div>
-      </th>
-      <td mat-cell *matCellDef="let weekRow">
-        @let unitReservations = weekRow.reservations[unit.id] || [];
-
-        @if (isReservedByDay(unitReservations)) {
-          <mat-accordion>
-            <mat-expansion-panel>
-              <mat-expansion-panel-header>
-                Reserved by the day
-              </mat-expansion-panel-header>
-              <mat-list>
-                @for (day of weekDates(weekRow); track $index) {
-                  <mat-list-item>
-                    @let reservation = reservationForDay(unitReservations, day);
-                    <span matListItemTitle>
-                      <span>{{ day | shortDate }}</span>
-                      @if (!!reservation && canEditReservation(reservation)) {
-                        <span style="float: right">
-                          <button mat-icon-button aria-label="Edit reservation"
-                                  (click)="editReservation(reservation, weekRow)">
-                            <mat-icon>edit</mat-icon>
-                          </button>
-                        </span>
-                      }
-                      @if (!reservation && canAddDailyReservation()) {
-                        <div class="add-button" style="float: right">
-                          <button mat-icon-button aria-label="Add reservation"
-                                  (click)="addReservation(weekRow, unit, day, day.plus({days: 1}))">
-                            <mat-icon class="material-icons-outlined">add_box</mat-icon>
-                        </button>
-                        </div>
-                      }
-                    </span>
-                    <span matListItemLine>{{ reservation?.guestName }}</span>
-                    <span>{{ bookerName(reservation?.bookerId || "") || '' }}</span>
-                  </mat-list-item>
-                }
-              </mat-list>
-            </mat-expansion-panel>
-          </mat-accordion>
-        } @else if (unitReservations?.length === 1) {
-          @let reservation = unitReservations[0];
-          <div>
-          <span>
-            {{ reservation.guestName }} ({{ bookerName(reservation.bookerId) || 'unknown' }})
-          </span>
-            @if (canEditReservation(reservation)) {
-              <span class="mat-button-small" style="float: left">
-              <button mat-icon-button aria-label="Edit reservation" (click)="editReservation(reservation, weekRow)">
-                <mat-icon>edit</mat-icon>
-              </button>
-            </span>
-            }
-          </div>
-        } @else {
-          @if (canAddReservation()) {
-            <div class="add-button">
-              <button mat-icon-button aria-label="Add reservation"
-                      (click)="addReservation(weekRow, unit, weekRow.startDate, weekRow.endDate)">
-                <mat-icon class="material-icons-outlined">add_box</mat-icon>
+          @if (canEditUnit()) {
+            <div>
+              <mat-icon class="vertical-middle">edit</mat-icon>
+              <button mat-button class="vertical-middle" aria-label="Edit unit" (click)="editUnit(unit)">
+                Manage
               </button>
             </div>
           }
-        }
+        </div>
+      </th>
+      <td mat-cell *matCellDef="let weekRow">
+        <app-reservable-week-cell
+          [weekRow]="weekRow"
+          [unit]="unit"
+          [unitReservations]="weekRow.reservations[unit.id] || []"
+          [bookers]="bookers"
+          [canAddReservation]="canAddReservation()"
+          [canAddDailyReservation]="canAddDailyReservation()"
+          [canEditReservationFn]="canEditReservation.bind(this)"
+          (addReservation)="addReservation(weekRow, unit, $event.startDate, $event.endDate)"
+          (editReservation)="editReservation($event, weekRow)"
+        ></app-reservable-week-cell>
       </td>
       <td mat-footer-cell *matFooterCellDef>
         <table class="mat-mdc-table">

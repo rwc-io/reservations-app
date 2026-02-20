@@ -1,6 +1,8 @@
+@use '../media_sizes' as media;
+
 .pricing-footer {
-  @media only screen and (max-width: 768px) {
-    display: none;
+  @media only screen and (max-width: media.$sm) {
+    /*display: none;*/
   }
 }
 
@@ -8,13 +10,9 @@
   text-align: center;
 }
 
-div.edit-unit {
-  display: inline-block;
-  vertical-align: top;
-}
-
 div.unit-header {
   display: inline-block;
+  text-align: left;
 }
 
 table {
@@ -25,9 +23,15 @@ th.unit-header {
   padding-top: 0.75em;
   padding-bottom: 0.75em;
   vertical-align: top;
+  text-align: center;
 }
 
 .mat-no-data-cell {
   padding: 30px;
   text-align: center;
+}
+
+.unit-name {
+  padding: 0 12px;
+  display: inline-block;
 }

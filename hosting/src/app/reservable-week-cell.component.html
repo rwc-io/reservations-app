@@ -1,0 +1,72 @@
+@if (isReservedByDay(unitReservations)) {
+  <mat-accordion>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        Reserved by the day
+      </mat-expansion-panel-header>
+      <div class="daily-chips">
+        @for (day of weekDates(weekRow); track $index) {
+          <mat-chip-set class="daily-chip-set" aria-orientation="vertical">
+            @let reservation = reservationForDay(unitReservations, day);
+            @if (!!reservation) {
+              @if (canEditReservation(reservation)) {
+                <mat-chip (click)="onEditReservation(reservation)" style="cursor: pointer">
+                  {{ day | shortDate }}
+                  <mat-icon matChipTrailingIcon>edit</mat-icon>
+                </mat-chip>
+              } @else {
+                <mat-chip>
+                  {{ day | shortDate }}
+                  <mat-icon matChipTrailingIcon>event</mat-icon>
+                </mat-chip>
+              }
+              <mat-chip class="name-chip">
+                {{ reservation.guestName || 'Unknown' }}
+              </mat-chip>
+              <mat-chip class="name-chip">
+                {{ bookerName(reservation.bookerId) || 'Unknown group' }}
+              </mat-chip>
+            } @else if (canAddDailyReservation) {
+              <mat-chip (click)="onAddReservation(day, day.plus({days: 1}))" style="cursor: pointer">
+                {{ day | shortDate }}
+                <mat-icon matChipTrailingIcon>add</mat-icon>
+              </mat-chip>
+            } @else {
+              <mat-chip disabled>
+                {{ day | shortDate }}
+              </mat-chip>
+            }
+          </mat-chip-set>
+        }
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+} @else if (unitReservations.length === 1) {
+  @let reservation = unitReservations[0];
+  <div class="reservation-container">
+    <mat-chip-set>
+      @if (canEditReservation(reservation)) {
+        <mat-chip (click)="onEditReservation(reservation)" style="cursor: pointer">
+          <mat-icon matChipTrailingIcon>edit</mat-icon>
+          {{ reservation.guestName || 'Unknown guest' }}
+          ({{ bookerName(reservation.bookerId) || 'Unknown group' }})
+        </mat-chip>
+      } @else {
+        <mat-chip>
+          <mat-icon matChipTrailingIcon>event</mat-icon>
+          {{ reservation.guestName || 'Unknown guest' }}
+          ({{ bookerName(reservation.bookerId) || 'Unknown group' }})
+        </mat-chip>
+      }
+    </mat-chip-set>
+  </div>
+} @else {
+  @if (canAddReservation) {
+    <div class="add-button">
+      <button mat-icon-button aria-label="Add reservation"
+              (click)="onAddReservation(weekRow.startDate, weekRow.endDate)">
+        <mat-icon class="material-icons-outlined">add_box</mat-icon>
+      </button>
+    </div>
+  }
+}

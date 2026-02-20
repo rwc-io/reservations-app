@@ -21,7 +21,7 @@ import {ShortDate} from './utility/short-date.pipe';
 import {from, Observable, of} from 'rxjs';
 import {BookableUnit, Booker, PricingTier, ReservableWeek, Reservation, UnitPricing, UnitPricingMap} from './types';
 import {DataService} from './data-service';
-import {MatAnchor, MatButton, MatIconButton} from '@angular/material/button';
+import {MatAnchor, MatButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {ReserveDialog, ReserveDialogData} from './reservations/reserve-dialog.component';
 import {MatDialog} from '@angular/material/dialog';
@@ -31,21 +31,19 @@ import {ErrorDialog} from './utility/error-dialog.component';
 import {CurrencyPipe} from './utility/currency-pipe';
 import {Auth} from '@angular/fire/auth';
 import {ReservationRoundsService} from './reservations/reservation-rounds-service';
-import {MatAccordion, MatExpansionPanel, MatExpansionPanelHeader} from '@angular/material/expansion';
-import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from '@angular/material/list';
 import {getDownloadURL, ref, Storage} from '@angular/fire/storage';
 import {EditUnitDialog} from './units/edit-unit-dialog.component';
 import {NotesDialog} from './units/notes-dialog.component';
+import {ReservableWeekCellComponent} from './reservable-week-cell.component';
 
-
-interface WeekRow {
+export interface WeekRow {
   startDate: DateTime;
   endDate: DateTime;
   pricingTier: PricingTier;
   reservations: Record<string, WeekReservation[]>;
 }
 
-interface WeekReservation {
+export interface WeekReservation {
   id: string;
   startDate: DateTime;
   endDate: DateTime;
@@ -73,22 +71,15 @@ interface WeekReservation {
     MatFooterRow,
     MatFooterRowDef,
     CurrencyPipe,
-    MatIconButton,
     MatIcon,
-    MatAccordion,
-    MatExpansionPanel,
-    MatExpansionPanelHeader,
-    MatList,
-    MatListItem,
-    MatListItemLine,
-    MatListItemTitle,
     AsyncPipe,
     MatButton,
     MatAnchor,
     MatNoDataRow,
+    ReservableWeekCellComponent,
   ],
   templateUrl: './week-table.component.html',
-  styleUrl: './week-table.component.css'
+  styleUrl: './week-table.component.scss'
 })
 export class WeekTableComponent {
   private readonly auth = inject(Auth);
@@ -166,6 +157,10 @@ export class WeekTableComponent {
   set bookers(value: Booker[]) {
     this._bookers.set(value);
     this.buildTableRows();
+  }
+
+  get bookers() {
+    return this._bookers();
   }
 
   @Input() set currentBooker(value: Booker | undefined) {
@@ -440,22 +435,6 @@ export class WeekTableComponent {
   bookerName(bookerId: string): string | undefined {
     const booker = this._bookers().find(it => it.id === bookerId);
     return booker?.name;
-  }
-
-  weekDates(week: WeekRow): DateTime[] {
-    return [...Array(7).keys()].map((i) => week.startDate.plus({days: i}));
-  }
-
-  isReservedByDay(reservations: WeekReservation[]): boolean {
-    return reservations?.some(reservation => {
-      return reservation.endDate.diff(reservation.startDate, 'days').days < 7;
-    });
-  }
-
-  reservationForDay(reservations: WeekReservation[], date: DateTime): WeekReservation | undefined {
-    return reservations.find(reservation => {
-      return reservation.startDate.equals(date);
-    });
   }
 
   rowStyle(pricingTier: PricingTier) {
