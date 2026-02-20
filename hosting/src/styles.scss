@@ -78,12 +78,16 @@ body {
 }
 
 main {
-  justify-content: center;
-  align-items: center;
-  margin-left: 10%;
-  margin-right: 10%;
-
-  padding-bottom: 48px;
+  @media only screen and (max-width: media.$md) {
+    margin-left: 2%;
+    margin-right: 2%;
+    padding: 0 16px 48px 16px;
+  }
+  @media only screen and (min-width: media.$md) {
+    margin-left: 10%;
+    margin-right: 10%;
+    padding: 0 0 48px 0;
+  }
 }
 
 .admin-component-contents {
