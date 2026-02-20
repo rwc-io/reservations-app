@@ -1,8 +1,8 @@
-import {Component, computed, inject, OnDestroy, signal, Signal, WritableSignal} from '@angular/core';
+import {Component, computed, inject, Signal} from '@angular/core';
 import {AsyncPipe, KeyValuePipe} from '@angular/common';
 import {AuthComponent, authState} from './auth/auth.component';
 import {Auth} from '@angular/fire/auth';
-import {combineLatest, from, Observable} from 'rxjs';
+import {from, Observable} from 'rxjs';
 import {WeekTableComponent} from './week-table.component';
 import {WeekAccordionComponent} from './week-accordion.component';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
@@ -25,7 +25,6 @@ import {TodayPicker} from './utility/today-picker.component';
 import {ReservationRoundsService} from './reservations/reservation-rounds-service';
 import {RoundConfigComponent} from './reservations/round-config.component';
 import {BookerPickerComponent} from './utility/booker-picker.component';
-import {toObservable} from '@angular/core/rxjs-interop';
 import {MatChip, MatChipSet} from '@angular/material/chips';
 import {FormsModule} from '@angular/forms';
 import {AuditLogComponent} from './reservations/audit-log.component';
@@ -41,6 +40,7 @@ import {EditAnnualDocumentDialog} from './admin/edit-annual-document-dialog.comp
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {YearSelectorComponent} from './utility/year-selector.component';
 import reservationsAppConfig from './reservations-app.config.json';
+import {PermissionsService} from './reservations/permissions-service';
 
 
 @Component({
@@ -70,13 +70,14 @@ import reservationsAppConfig from './reservations-app.config.json';
   templateUrl: './reservations.component.html',
   styleUrl: './reservations.component.css'
 })
-export class ReservationsComponent implements OnDestroy {
+export class ReservationsComponent {
   private readonly auth = inject(Auth);
   protected readonly dataService = inject(DataService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly storage = inject(Storage);
   protected readonly reservationRoundsService = inject(ReservationRoundsService);
+  protected readonly permissionsService = inject(PermissionsService);
   private readonly todayService = inject(TodayService);
   private readonly breakpointObserver = inject(BreakpointObserver);
 
@@ -87,14 +88,12 @@ export class ReservationsComponent implements OnDestroy {
   user$ = authState(this.auth);
 
   today: Signal<DateTime>;
-  bookerIdOverride: WritableSignal<string> = signal('');
 
   title = reservationsAppConfig.applicationTitle;
 
   annualDocumentFilename: Signal<string>;
   annualDocumentDownloadUrl: Signal<Observable<string>>;
   bookers: Signal<Booker[]>;
-  currentBooker: WritableSignal<Booker | undefined> = signal(undefined);
   weeks$: Observable<ReservableWeek[]>;
   reservationRounds$: Observable<ReservationRound[]>;
   reservations$: Observable<Reservation[]>;
@@ -103,8 +102,7 @@ export class ReservationsComponent implements OnDestroy {
   pricingTiers$: Observable<PricingTier[]>;
   unitPricing$: Observable<UnitPricingMap>;
 
-  isAdmin = this.dataService.isAdmin;
-  bookersSubscription;
+  isAdmin: Signal<boolean> = this.permissionsService.isAdmin;
 
   constructor() {
     const reservationRoundsService = inject(ReservationRoundsService);
@@ -125,20 +123,7 @@ export class ReservationsComponent implements OnDestroy {
       return from(getDownloadURL(ref(rootRef, this.annualDocumentFilename())))
     });
 
-    this.bookersSubscription = combineLatest([toObservable(dataService.bookers), this.user$, toObservable(this.bookerIdOverride)]).subscribe(
-      ([bookers, user, bookerIdOverride]) => {
-        this.currentBooker.set(bookerIdOverride ?
-          bookers.find(booker => booker.id === bookerIdOverride) :
-          bookers.find(booker => booker.userId === user?.uid)
-        )
-      }
-    )
-
     this.today = this.todayService.today;
-  }
-
-  ngOnDestroy() {
-    this.bookersSubscription?.unsubscribe();
   }
 
   bookerName(bookerId: string): string {

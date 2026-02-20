@@ -23,6 +23,7 @@ import {WeekReservation, WeekRow} from './week-table.component';
 import {WeekPanelComponent} from './week-panel.component';
 import {ReserveDialog, ReserveDialogData} from './reservations/reserve-dialog.component';
 import {CurrencyPipe} from './utility/currency-pipe';
+import {PermissionsService} from './reservations/permissions-service';
 
 @Component({
   selector: 'app-week-accordion',
@@ -113,9 +114,10 @@ export class WeekAccordionComponent {
   private readonly dataService = inject(DataService);
   private readonly dialog = inject(MatDialog);
   private readonly reservationsRoundsService = inject(ReservationRoundsService);
+  private readonly permissionsService = inject(PermissionsService);
 
   private _bookers: WritableSignal<Booker[]> = signal([]);
-  private _currentBooker: WritableSignal<Booker | undefined> = signal(undefined);
+  private _currentBooker: Signal<Booker | undefined> = this.permissionsService.currentBooker;
   private _reservations: Reservation[] = [];
   private _pricingTiers: PricingTier[] = [];
   private _units: BookableUnit[] = [];
@@ -132,11 +134,6 @@ export class WeekAccordionComponent {
 
   get bookers() {
     return this._bookers();
-  }
-
-  @Input() set currentBooker(value: Booker | undefined) {
-    this._currentBooker.set(value);
-    this.buildTableRows();
   }
 
   @Input() set units(value: BookableUnit[]) {
@@ -268,7 +265,7 @@ export class WeekAccordionComponent {
         existingReservationId: existingReservation?.id,
         allowDailyReservations: this.canAddDailyReservation(),
         blockedDates: this.blockedDaysFor(reservationsForUnit, existingReservation),
-        canDelete: !!existingReservation && this.canEditReservation(existingReservation)
+        canDelete: !!existingReservation && this.canDeleteReservation(existingReservation)
       } as ReserveDialogData,
       ...ANIMATION_SETTINGS
     });
@@ -290,35 +287,27 @@ export class WeekAccordionComponent {
 
   availableBookers(): Booker[] {
     const currentBooker = this._currentBooker();
-    if (this.actingAsAdmin()) {
+    if (this.permissionsService.actingAsAdmin()) {
       return this.bookers;
     }
     return this.bookers.filter(booker => booker.id === currentBooker?.id);
   }
 
-  actingAsAdmin(): boolean {
-    return this.dataService.isAdmin() && !!this._currentBooker() && this._currentBooker()?.userId !== this.auth.currentUser?.uid;
-  }
 
   canAddReservation(): boolean {
-    const currentRound = this.reservationsRoundsService.currentRound();
-    if (!currentRound) return this.dataService.isAdmin();
-    const currentBooker = this._currentBooker();
-    if (!currentBooker) return false;
-    const isOurRound = !currentRound.subRoundBookerIds || currentRound.subRoundBookerIds.length === 0 || currentRound.subRoundBookerIds.includes(currentBooker.id);
-    if (!isOurRound) return false;
-    const bookedWeeks = this._reservations.filter(reservation => reservation.bookerId === currentBooker?.id).length;
-    return bookedWeeks < currentRound.bookedWeeksLimit;
+    return this.permissionsService.canAddReservation(this._reservations);
   }
 
   canAddDailyReservation(): boolean {
-    return this.reservationsRoundsService.currentRound()?.allowDailyReservations || this.dataService.isAdmin();
+    return this.permissionsService.canAddDailyReservation(this._reservations);
   }
 
   canEditReservation(reservation: WeekReservation): boolean {
-    const currentRound = this.reservationsRoundsService.currentRound();
-    if (!currentRound) return this.dataService.isAdmin();
-    return (this.dataService.isAdmin() || reservation.bookerId === this._currentBooker()?.id);
+    return this.permissionsService.canEditReservation(reservation);
+  }
+
+  canDeleteReservation(reservation: WeekReservation): boolean {
+    return this.permissionsService.canDeleteReservation(reservation);
   }
 
   editReservation(reservation: WeekReservation, week: WeekRow) {

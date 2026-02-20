@@ -29,12 +29,11 @@ import {DateTime} from 'luxon';
 import {ANIMATION_SETTINGS, FLOOR_PLANS_FOLDER} from './app.config';
 import {ErrorDialog} from './utility/error-dialog.component';
 import {CurrencyPipe} from './utility/currency-pipe';
-import {Auth} from '@angular/fire/auth';
-import {ReservationRoundsService} from './reservations/reservation-rounds-service';
 import {getDownloadURL, ref, Storage} from '@angular/fire/storage';
 import {EditUnitDialog} from './units/edit-unit-dialog.component';
 import {NotesDialog} from './units/notes-dialog.component';
 import {ReservableWeekCellComponent} from './reservable-week-cell.component';
+import {PermissionsService} from './reservations/permissions-service';
 
 export interface WeekRow {
   startDate: DateTime;
@@ -82,15 +81,13 @@ export interface WeekReservation {
   styleUrl: './week-table.component.scss'
 })
 export class WeekTableComponent {
-  private readonly auth = inject(Auth);
   private readonly dataService = inject(DataService);
   private readonly dialog = inject(MatDialog);
-  private readonly reservationsRoundsService = inject(ReservationRoundsService);
   private readonly storage = inject(Storage)
+  protected readonly permissionsService = inject(PermissionsService);
 
   // Input fields
   private _bookers: WritableSignal<Booker[]> = signal([]);
-  private _currentBooker: WritableSignal<Booker | undefined> = signal(undefined);
   private _reservations: Reservation[] = [];
   private _pricingTiers: PricingTier[] = [];
   private _units: BookableUnit[] = [];
@@ -163,11 +160,6 @@ export class WeekTableComponent {
     return this._bookers();
   }
 
-  @Input() set currentBooker(value: Booker | undefined) {
-    this._currentBooker.set(value);
-    this.buildTableRows()
-  }
-
   @Input()
   set units(value: BookableUnit[]) {
     this._units = value;
@@ -218,11 +210,11 @@ export class WeekTableComponent {
   // Helper functions
 
   availableBookers(): Booker[] {
-    const currentBooker = this._currentBooker;
+    const currentBooker = this.permissionsService.currentBooker();
     const bookers = this._bookers;
 
     return bookers().filter(booker => {
-      return this.actingAsAdmin() || booker.userId === currentBooker()?.userId;
+      return this.permissionsService.actingAsAdmin() || booker.userId === currentBooker?.userId;
     });
   }
 
@@ -237,7 +229,6 @@ export class WeekTableComponent {
 
   private openReserveDialog(unit: BookableUnit, weekRow: WeekRow, startDate: DateTime, endDate: DateTime, existingReservation?: WeekReservation) {
     const unitPricing = this._unitPricing[unit.id] || [];
-    const allowDailyReservations = this.actingAsAdmin() || this.reservationsRoundsService.currentRound()?.allowDailyReservations || false;
     const blockedDates = this.blockedDaysFor(weekRow.reservations[unit.id], existingReservation)
 
     // Always honor the existing reservation being edited
@@ -254,7 +245,7 @@ export class WeekTableComponent {
         endDate: endDate,
         unitPricing,
         bookers: this.availableBookers(),
-        allowDailyReservations,
+        allowDailyReservations: this.canAddDailyReservation(),
         blockedDates,
         initialGuestName: existingReservation?.guestName,
         initialBookerId: existingReservation?.bookerId,
@@ -265,57 +256,24 @@ export class WeekTableComponent {
     });
   }
 
-  actingAsAdmin(): boolean {
-    // There is no admin booker. If one is set (whether as an override, or
-    // otherwise) don't set the admin status.
-    if (this._currentBooker()?.id) {
-      return false;
-    }
-    return this.dataService.isAdmin();
-  }
-
   canAddReservation(): boolean {
-    if (this.actingAsAdmin()) {
-      return true;
-    }
-    const currentBooker = this._currentBooker();
-    const currentRound = this.reservationsRoundsService.currentRound();
-    const currentSubRoundBooker = this.reservationsRoundsService.currentSubRoundBooker();
-
-    const bookableRound = !!currentRound && (!currentSubRoundBooker || currentSubRoundBooker.id === currentBooker?.id);
-
-    const applicableBookingLimit = currentRound?.bookedWeeksLimit || 0;
-    const bookedWeeks = this._reservations.filter(reservation => reservation.bookerId === currentBooker?.id).length;
-    const underBookingLimit = applicableBookingLimit === 0 || bookedWeeks < applicableBookingLimit;
-
-    return bookableRound && underBookingLimit;
+    return this.permissionsService.canAddReservation(this._reservations);
   }
 
   canAddDailyReservation(): boolean {
-    return this.canAddReservation() && (this.actingAsAdmin() || this.reservationsRoundsService.currentRound()?.allowDailyReservations || false);
+    return this.permissionsService.canAddDailyReservation(this._reservations);
   }
 
   canEditReservation(reservation: WeekReservation): boolean {
-    if (this.actingAsAdmin()) {
-      return true;
-    }
-    return reservation.bookerId === this._currentBooker()?.id;
+    return this.permissionsService.canEditReservation(reservation);
   }
 
   canDeleteReservation(reservation: WeekReservation): boolean {
-    // Admins can always delete
-    if (this.actingAsAdmin()) {
-      return true;
-    }
-
-    // Allow deletions if the current round allows them, and, the reservation belongs to the current booker
-    const currentRound = this.reservationsRoundsService.currentRound();
-    const subRoundBooker = this.reservationsRoundsService.currentSubRoundBooker();
-    return !!currentRound && currentRound.allowDeletions && reservation.bookerId === this._currentBooker()?.id && (!subRoundBooker || subRoundBooker.id === reservation.bookerId);
+    return this.permissionsService.canDeleteReservation(reservation);
   }
 
   canEditUnit(): boolean {
-    return this.actingAsAdmin();
+    return this.permissionsService.actingAsAdmin();
   }
 
   blockedDaysFor(reservations: WeekReservation[], reservation?: WeekReservation) {
@@ -430,11 +388,6 @@ export class WeekTableComponent {
     }
 
     return unitPricing.find(it => it.tierId === pricingTier.id);
-  }
-
-  bookerName(bookerId: string): string | undefined {
-    const booker = this._bookers().find(it => it.id === bookerId);
-    return booker?.name;
   }
 
   rowStyle(pricingTier: PricingTier) {

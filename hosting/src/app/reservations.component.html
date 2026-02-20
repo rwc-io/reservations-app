@@ -3,7 +3,7 @@
   <p>Today is: {{ today().toISODate() }}</p>
   @if (isAdmin()) {
     <app-today-picker [today]="today()"></app-today-picker>
-    <app-booker-picker (bookerId)="bookerIdOverride.set($event)" [bookers]="bookers"></app-booker-picker>
+    <app-booker-picker></app-booker-picker>
     <button mat-button class="secondary-button" routerLink="/admin">
       Admin panel
     </button>
@@ -44,7 +44,6 @@
     @if (isSmallScreen()) {
       <app-week-accordion
         [bookers]="bookers()"
-        [currentBooker]="currentBooker()"
         [weeks]="(weeks$ | async) || []"
         [units]="units()"
         [pricingTiers]="(pricingTiers$ | async) || []"
@@ -54,7 +53,6 @@
     } @else {
       <app-week-table
         [bookers]="bookers()"
-        [currentBooker]="currentBooker()"
         [weeks]="(weeks$ | async) || []"
         [units]="units()"
         [pricingTiers]="(pricingTiers$ | async) || []"

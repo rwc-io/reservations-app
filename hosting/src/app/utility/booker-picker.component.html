@@ -2,10 +2,10 @@
   <div>
     <mat-form-field>
       <mat-label>Booking as</mat-label>
-      <mat-select [(ngModel)]="_bookerId">
+      <mat-select [(ngModel)]="bookerIdOverride">
         <mat-option [value]="''">Admin</mat-option>
         @for (booker of sortedBookers(); track booker.id) {
-          <mat-option>
+          <mat-option [value]="booker.id">
             {{ booker.name }}
           </mat-option>
         }
