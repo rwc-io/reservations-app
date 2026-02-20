@@ -4,6 +4,10 @@ import {AuthComponent, authState} from './auth/auth.component';
 import {Auth} from '@angular/fire/auth';
 import {combineLatest, from, Observable} from 'rxjs';
 import {WeekTableComponent} from './week-table.component';
+import {WeekAccordionComponent} from './week-accordion.component';
+import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {map} from 'rxjs/operators';
 import {
   BookableUnit,
   Booker,
@@ -44,6 +48,7 @@ import {YearSelectorComponent} from './utility/year-selector.component';
     AsyncPipe,
     AuthComponent,
     WeekTableComponent,
+    WeekAccordionComponent,
     TodayPicker,
     RoundConfigComponent,
     BookerPickerComponent,
@@ -72,6 +77,12 @@ export class ReservationsComponent implements OnDestroy {
   private readonly storage = inject(Storage);
   protected readonly reservationRoundsService = inject(ReservationRoundsService);
   private readonly todayService = inject(TodayService);
+  private readonly breakpointObserver = inject(BreakpointObserver);
+
+  isSmallScreen = toSignal(
+    this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]).pipe(map(result => result.matches))
+  );
+
   user$ = authState(this.auth);
 
   today: Signal<DateTime>;

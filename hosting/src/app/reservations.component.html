@@ -41,15 +41,27 @@
         </mat-chip>
       }
     </mat-chip-set>
-    <app-week-table
-      [bookers]="bookers()"
-      [currentBooker]="currentBooker()"
-      [weeks]="(weeks$ | async) || []"
-      [units]="units()"
-      [pricingTiers]="(pricingTiers$ | async) || []"
-      [reservations]="(reservations$ | async) || []"
-      [unitPricing]="(unitPricing$ | async) || {}"
-    />
+    @if (isSmallScreen()) {
+      <app-week-accordion
+        [bookers]="bookers()"
+        [currentBooker]="currentBooker()"
+        [weeks]="(weeks$ | async) || []"
+        [units]="units()"
+        [pricingTiers]="(pricingTiers$ | async) || []"
+        [reservations]="(reservations$ | async) || []"
+        [unitPricing]="(unitPricing$ | async) || {}"
+      />
+    } @else {
+      <app-week-table
+        [bookers]="bookers()"
+        [currentBooker]="currentBooker()"
+        [weeks]="(weeks$ | async) || []"
+        [units]="units()"
+        [pricingTiers]="(pricingTiers$ | async) || []"
+        [reservations]="(reservations$ | async) || []"
+        [unitPricing]="(unitPricing$ | async) || {}"
+      />
+    }
     <mat-card>
       <mat-card-header>
         <h1>Reservation Rounds</h1>

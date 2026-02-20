@@ -21,7 +21,7 @@ import {ShortDate} from './utility/short-date.pipe';
 import {from, Observable, of} from 'rxjs';
 import {BookableUnit, Booker, PricingTier, ReservableWeek, Reservation, UnitPricing, UnitPricingMap} from './types';
 import {DataService} from './data-service';
-import {MatAnchor, MatButton, MatIconButton} from '@angular/material/button';
+import {MatAnchor, MatButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {ReserveDialog, ReserveDialogData} from './reservations/reserve-dialog.component';
 import {MatDialog} from '@angular/material/dialog';
@@ -71,7 +71,6 @@ export interface WeekReservation {
     MatFooterRow,
     MatFooterRowDef,
     CurrencyPipe,
-    MatIconButton,
     MatIcon,
     AsyncPipe,
     MatButton,
