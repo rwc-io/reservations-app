@@ -43,7 +43,6 @@
     </mat-chip-set>
     @if (isSmallScreen()) {
       <app-week-accordion
-        [bookers]="bookers()"
         [weeks]="(weeks$ | async) || []"
         [units]="units()"
         [pricingTiers]="(pricingTiers$ | async) || []"
@@ -52,7 +51,6 @@
       />
     } @else {
       <app-week-table
-        [bookers]="bookers()"
         [weeks]="(weeks$ | async) || []"
         [units]="units()"
         [pricingTiers]="(pricingTiers$ | async) || []"
@@ -65,7 +63,7 @@
         <h1>Reservation Rounds</h1>
       </mat-card-header>
       <mat-card-content>
-        <app-round-config [rounds$]="reservationRounds$" [bookers]="bookers"/>
+        <app-round-config [rounds$]="reservationRounds$"/>
         @if (isAdmin()) {
           <button mat-button class="secondary-button" routerLink="/admin/reservation-rounds">
             Manage rounds
@@ -74,7 +72,7 @@
       </mat-card-content>
     </mat-card>
     @if (isAdmin()) {
-      <app-audit-log [reservationsAuditLog$]="reservationsAuditLog$" [bookers]="bookers" [units]="units"/>
+      <app-audit-log [reservationsAuditLog$]="reservationsAuditLog$" [units]="units"/>
     }
   } @else {
     <p>

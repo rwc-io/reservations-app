@@ -1,10 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  inject,
   Input,
   model,
   OnDestroy,
-  Signal,
   signal,
   WritableSignal,
 } from '@angular/core';
@@ -12,6 +12,7 @@ import {DateTime} from 'luxon';
 import {Booker, ReservationRound} from '../types';
 import {Observable, Subscription} from 'rxjs';
 import {ShortDate} from '../utility/short-date.pipe';
+import {DataService} from '../data-service';
 
 @Component({
   selector: 'app-round-config',
@@ -22,11 +23,10 @@ import {ShortDate} from '../utility/short-date.pipe';
   ]
 })
 export class RoundConfigComponent implements OnDestroy {
+  private readonly dataService = inject(DataService);
   _today = model(DateTime.now());
 
   rounds: WritableSignal<ReservationRound[]> = signal([]);
-  @Input()
-  bookers: Signal<Booker[]> = signal([]);
 
   roundsSubscription?: Subscription = undefined;
 
@@ -44,7 +44,7 @@ export class RoundConfigComponent implements OnDestroy {
   }
 
   bookerFor(bookerId: string): Booker | undefined {
-    return this.bookers().find(booker => booker.id === bookerId);
+    return this.dataService.bookers().find(booker => booker.id === bookerId);
   }
 
   offsetDate(date: DateTime, weeks: number): DateTime {

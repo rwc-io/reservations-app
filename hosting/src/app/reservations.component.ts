@@ -10,7 +10,6 @@ import {toSignal} from '@angular/core/rxjs-interop';
 import {map} from 'rxjs/operators';
 import {
   BookableUnit,
-  Booker,
   PricingTier,
   ReservableWeek,
   Reservation,
@@ -93,7 +92,6 @@ export class ReservationsComponent {
 
   annualDocumentFilename: Signal<string>;
   annualDocumentDownloadUrl: Signal<Observable<string>>;
-  bookers: Signal<Booker[]>;
   weeks$: Observable<ReservableWeek[]>;
   reservationRounds$: Observable<ReservationRound[]>;
   reservations$: Observable<Reservation[]>;
@@ -109,7 +107,6 @@ export class ReservationsComponent {
 
     const dataService = this.dataService;
     this.annualDocumentFilename = dataService.annualDocumentFilename;
-    this.bookers = dataService.bookers;
     this.pricingTiers$ = dataService.pricingTiers$;
     this.reservationRounds$ = reservationRoundsService.reservationRounds$;
     this.reservations$ = dataService.reservations$;
@@ -127,7 +124,7 @@ export class ReservationsComponent {
   }
 
   bookerName(bookerId: string): string {
-    return this.bookers().find(booker => booker.id === bookerId)?.name || '';
+    return this.dataService.bookers().find(booker => booker.id === bookerId)?.name || '';
   }
 
   editAnnualDocument() {

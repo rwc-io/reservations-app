@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {BookableUnit, Booker, PricingTier, UnitPricingMap} from './types';
+import {BookableUnit, PricingTier, UnitPricingMap} from './types';
 import {WeekReservation, WeekRow} from './week-table.component';
 import {DateTime} from 'luxon';
 import {ReservableWeekCellComponent} from './reservable-week-cell.component';
@@ -29,7 +29,6 @@ import {MatCardModule} from '@angular/material/card';
           [weekRow]="weekRow"
           [unit]="unit"
           [unitReservations]="weekRow.reservations[unit.id] || []"
-          [bookers]="bookers"
           [canAddReservation]="canAddReservation"
           [canAddDailyReservation]="canAddDailyReservation"
           [canEditReservationFn]="canEditReservationFn"
@@ -51,7 +50,6 @@ import {MatCardModule} from '@angular/material/card';
 export class ReservableWeekCardComponent {
   @Input({required: true}) unit!: BookableUnit;
   @Input({required: true}) weekRow!: WeekRow;
-  @Input({required: true}) bookers!: Booker[];
   @Input({required: true}) unitPricing!: UnitPricingMap;
   @Input({required: true}) canAddReservation!: boolean;
   @Input({required: true}) canAddDailyReservation!: boolean;

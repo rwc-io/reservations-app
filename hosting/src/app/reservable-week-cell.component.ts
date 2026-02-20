@@ -1,13 +1,14 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIcon} from '@angular/material/icon';
 import {MatIconButton} from '@angular/material/button';
 import {MatAccordion, MatExpansionPanel, MatExpansionPanelHeader} from '@angular/material/expansion';
 import {MatChip, MatChipSet, MatChipTrailingIcon} from '@angular/material/chips';
 import {DateTime} from 'luxon';
-import {BookableUnit, Booker} from './types';
+import {BookableUnit} from './types';
 import {WeekReservation, WeekRow} from './week-table.component';
 import {ShortDate} from './utility/short-date.pipe';
+import {DataService} from './data-service';
 
 @Component({
   selector: 'app-reservable-week-cell',
@@ -28,10 +29,11 @@ import {ShortDate} from './utility/short-date.pipe';
   styleUrl: './reservable-week-cell.component.scss'
 })
 export class ReservableWeekCellComponent {
+  private readonly dataService = inject(DataService);
+
   @Input({required: true}) weekRow!: WeekRow;
   @Input({required: true}) unit!: BookableUnit;
   @Input({required: true}) unitReservations!: WeekReservation[];
-  @Input({required: true}) bookers!: Booker[];
   @Input({required: true}) canAddReservation!: boolean;
   @Input({required: true}) canAddDailyReservation!: boolean;
   @Input({required: true}) canEditReservationFn!: (reservation: WeekReservation) => boolean;
@@ -56,7 +58,7 @@ export class ReservableWeekCellComponent {
   }
 
   bookerName(bookerId: string): string | undefined {
-    return this.bookers.find(it => it.id === bookerId)?.name;
+    return this.dataService.bookers().find(it => it.id === bookerId)?.name;
   }
 
   onAddReservation(startDate: DateTime, endDate: DateTime) {

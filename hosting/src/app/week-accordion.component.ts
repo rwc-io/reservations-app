@@ -1,4 +1,4 @@
-import {Component, computed, inject, Input, signal, Signal, WritableSignal} from '@angular/core';
+import {Component, computed, inject, Input, Signal} from '@angular/core';
 import {AsyncPipe} from '@angular/common';
 import {
   MatAccordion,
@@ -17,8 +17,6 @@ import {MatDialog} from '@angular/material/dialog';
 import {DateTime} from 'luxon';
 import {ANIMATION_SETTINGS} from './app.config';
 import {ErrorDialog} from './utility/error-dialog.component';
-import {Auth} from '@angular/fire/auth';
-import {ReservationRoundsService} from './reservations/reservation-rounds-service';
 import {WeekReservation, WeekRow} from './week-table.component';
 import {WeekPanelComponent} from './week-panel.component';
 import {ReserveDialog, ReserveDialogData} from './reservations/reserve-dialog.component';
@@ -53,7 +51,6 @@ import {PermissionsService} from './reservations/permissions-service';
           <app-week-panel
             [weekRow]="row"
             [units]="units"
-            [bookers]="bookers"
             [unitPricing]="unitPricing"
             [canAddReservation]="canAddReservation()"
             [canAddDailyReservation]="canAddDailyReservation()"
@@ -95,28 +92,12 @@ import {PermissionsService} from './reservations/permissions-service';
       }
     </mat-accordion>
   `,
-  styles: [`
-    .no-data {
-      padding: 30px;
-      text-align: center;
-    }
-
-    .pricing-cards {
-      display: flex;
-      flex-direction: column;
-      gap: 1em;
-      padding: 1em 0;
-    }
-  `]
 })
 export class WeekAccordionComponent {
-  private readonly auth = inject(Auth);
   private readonly dataService = inject(DataService);
   private readonly dialog = inject(MatDialog);
-  private readonly reservationsRoundsService = inject(ReservationRoundsService);
   private readonly permissionsService = inject(PermissionsService);
 
-  private _bookers: WritableSignal<Booker[]> = signal([]);
   private _currentBooker: Signal<Booker | undefined> = this.permissionsService.currentBooker;
   private _reservations: Reservation[] = [];
   private _pricingTiers: PricingTier[] = [];
@@ -126,15 +107,6 @@ export class WeekAccordionComponent {
 
   tableRows$: Observable<WeekRow[]> = of([])
   activeYear: Signal<number> = computed(() => this.dataService.activeYear());
-
-  @Input() set bookers(value: Booker[]) {
-    this._bookers.set(value);
-    this.buildTableRows();
-  }
-
-  get bookers() {
-    return this._bookers();
-  }
 
   @Input() set units(value: BookableUnit[]) {
     this._units = value;
@@ -288,9 +260,9 @@ export class WeekAccordionComponent {
   availableBookers(): Booker[] {
     const currentBooker = this._currentBooker();
     if (this.permissionsService.actingAsAdmin()) {
-      return this.bookers;
+      return this.dataService.bookers();
     }
-    return this.bookers.filter(booker => booker.id === currentBooker?.id);
+    return this.dataService.bookers().filter(booker => booker.id === currentBooker?.id);
   }
 
 

@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  inject,
   Input,
   model,
   OnDestroy,
@@ -9,13 +10,14 @@ import {
   WritableSignal,
 } from '@angular/core';
 import {DateTime} from 'luxon';
-import {BookableUnit, Booker, ReservationAuditLog} from '../types';
+import {BookableUnit, ReservationAuditLog} from '../types';
 import {Observable, Subscription} from 'rxjs';
 import {MatList, MatListItem, MatListItemIcon, MatListItemLine, MatListItemTitle} from '@angular/material/list';
 import {ShortDate} from '../utility/short-date.pipe';
 import {MatIcon} from '@angular/material/icon';
 import {ShortDateTime} from '../utility/short-datetime.pipe';
 import {MatAccordion, MatExpansionPanel, MatExpansionPanelHeader} from '@angular/material/expansion';
+import {DataService} from '../data-service';
 
 @Component({
   selector: 'app-audit-log',
@@ -36,11 +38,12 @@ import {MatAccordion, MatExpansionPanel, MatExpansionPanelHeader} from '@angular
   ]
 })
 export class AuditLogComponent implements OnDestroy {
+  private readonly dataService = inject(DataService);
+
   _today = model(DateTime.now());
 
   auditLog: WritableSignal<ReservationAuditLog[]> = signal([]);
 
-  @Input() bookers: Signal<Booker[]> = signal([]);
   @Input() units: Signal<BookableUnit[]> = signal([]);
 
   auditLogSubscription?: Subscription = undefined;
@@ -141,11 +144,11 @@ export class AuditLogComponent implements OnDestroy {
   }
 
   bookerBefore(entry: ReservationAuditLog) {
-    return this.bookers().find(booker => booker.id === entry.before['bookerId']);
+    return this.dataService.bookers().find(booker => booker.id === entry.before['bookerId']);
   }
 
   bookerAfter(entry: ReservationAuditLog) {
-    return this.bookers().find(booker => booker.id === entry.after['bookerId']);
+    return this.dataService.bookers().find(booker => booker.id === entry.after['bookerId']);
   }
 
   startDate(entry: ReservationAuditLog) {

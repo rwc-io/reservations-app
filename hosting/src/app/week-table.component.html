@@ -46,7 +46,6 @@
           [weekRow]="weekRow"
           [unit]="unit"
           [unitReservations]="weekRow.reservations[unit.id] || []"
-          [bookers]="bookers"
           [canAddReservation]="canAddReservation()"
           [canAddDailyReservation]="canAddDailyReservation()"
           [canEditReservationFn]="canEditReservation.bind(this)"
@@ -77,7 +76,7 @@
       [style]="rowStyle(row.pricingTier)">
   </tr>
   <tr class="mat-row" *matNoDataRow>
-    <td class="mat-cell" class="weeks-content" [attr.colspan]="displayedColumns.length">
+    <td class="mat-cell weeks-content" [attr.colspan]="displayedColumns.length">
       <h2>No reservable weeks configured for {{activeYear()}}.</h2>
     </td>
   </tr>

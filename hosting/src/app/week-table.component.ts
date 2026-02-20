@@ -1,4 +1,4 @@
-import {Component, computed, inject, Input, Signal, signal, WritableSignal} from '@angular/core';
+import {Component, computed, inject, Input, Signal} from '@angular/core';
 import {AsyncPipe} from '@angular/common';
 import {
   MatCell,
@@ -38,7 +38,7 @@ import {PermissionsService} from './reservations/permissions-service';
 export interface WeekRow {
   startDate: DateTime;
   endDate: DateTime;
-  pricingTier: PricingTier;
+  pricingTier: PricingTier | undefined;
   reservations: Record<string, WeekReservation[]>;
 }
 
@@ -87,7 +87,6 @@ export class WeekTableComponent {
   protected readonly permissionsService = inject(PermissionsService);
 
   // Input fields
-  private _bookers: WritableSignal<Booker[]> = signal([]);
   private _reservations: Reservation[] = [];
   private _pricingTiers: PricingTier[] = [];
   private _units: BookableUnit[] = [];
@@ -151,16 +150,6 @@ export class WeekTableComponent {
   // Input functions
 
   @Input()
-  set bookers(value: Booker[]) {
-    this._bookers.set(value);
-    this.buildTableRows();
-  }
-
-  get bookers() {
-    return this._bookers();
-  }
-
-  @Input()
   set units(value: BookableUnit[]) {
     this._units = value;
     const rootRef = ref(this.storage, FLOOR_PLANS_FOLDER);
@@ -211,9 +200,8 @@ export class WeekTableComponent {
 
   availableBookers(): Booker[] {
     const currentBooker = this.permissionsService.currentBooker();
-    const bookers = this._bookers;
 
-    return bookers().filter(booker => {
+    return this.dataService.bookers().filter(booker => {
       return this.permissionsService.actingAsAdmin() || booker.userId === currentBooker?.userId;
     });
   }
