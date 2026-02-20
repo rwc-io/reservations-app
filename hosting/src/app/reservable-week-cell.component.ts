@@ -3,7 +3,6 @@ import {CommonModule} from '@angular/common';
 import {MatIcon} from '@angular/material/icon';
 import {MatIconButton} from '@angular/material/button';
 import {MatAccordion, MatExpansionPanel, MatExpansionPanelHeader} from '@angular/material/expansion';
-import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from '@angular/material/list';
 import {MatChip, MatChipSet, MatChipTrailingIcon} from '@angular/material/chips';
 import {DateTime} from 'luxon';
 import {BookableUnit, Booker} from './types';
@@ -20,10 +19,6 @@ import {ShortDate} from './utility/short-date.pipe';
     MatAccordion,
     MatExpansionPanel,
     MatExpansionPanelHeader,
-    MatList,
-    MatListItem,
-    MatListItemLine,
-    MatListItemTitle,
     MatChip,
     ShortDate,
     MatChipSet,
