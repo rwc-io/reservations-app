@@ -36,6 +36,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {EditAnnualDocumentDialog} from './admin/edit-annual-document-dialog.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {YearSelectorComponent} from './utility/year-selector.component';
+import reservationsAppConfig from './reservations-app.config.json';
 
 
 @Component({
@@ -77,7 +78,7 @@ export class ReservationsComponent implements OnDestroy {
   today: Signal<DateTime>;
   bookerIdOverride: WritableSignal<string> = signal('');
 
-  title = 'Reservations-App';
+  title = reservationsAppConfig.applicationTitle;
 
   annualDocumentFilename: Signal<string>;
   annualDocumentDownloadUrl: Signal<Observable<string>>;
