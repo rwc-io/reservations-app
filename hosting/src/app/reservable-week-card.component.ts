@@ -19,7 +19,7 @@ import {MatCardModule} from '@angular/material/card';
       <mat-card-header>
         <mat-card-title>{{ unit.name }}</mat-card-title>
         <mat-card-subtitle>
-          {{ weekRow.pricingTier.name }} tier:
+          {{ weekRow.pricingTier?.name || 'Unknown' }} tier:
           {{ unitTierPricing(unit, weekRow.pricingTier)?.weeklyPrice | currency }}/wk,
           {{ unitTierPricing(unit, weekRow.pricingTier)?.dailyPrice | currency }}/day
         </mat-card-subtitle>
@@ -60,7 +60,10 @@ export class ReservableWeekCardComponent {
   @Output() addReservation = new EventEmitter<{ startDate: DateTime; endDate: DateTime }>();
   @Output() editReservation = new EventEmitter<WeekReservation>();
 
-  unitTierPricing(unit: BookableUnit, pricingTier: PricingTier) {
+  unitTierPricing(unit: BookableUnit, pricingTier: PricingTier | undefined) {
+    if (pricingTier === undefined) {
+      return undefined;
+    }
     return this.unitPricing[unit.id]?.find(it => it.tierId === pricingTier.id);
   }
 }

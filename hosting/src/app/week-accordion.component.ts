@@ -46,7 +46,7 @@ import {CurrencyPipe} from './utility/currency-pipe';
         <mat-expansion-panel>
           <mat-expansion-panel-header>
             <mat-panel-title>
-              {{ row.startDate | shortDate }} – {{ row.endDate | shortDate }}: {{ row.pricingTier.name || '' }}
+              {{ row.startDate | shortDate }} – {{ row.endDate | shortDate }}: {{ row.pricingTier?.name || '' }}
             </mat-panel-title>
           </mat-expansion-panel-header>
           <app-week-panel
