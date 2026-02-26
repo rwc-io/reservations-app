@@ -50,11 +50,17 @@ export interface ReservationAuditLog {
   after: Record<string, string | number | Timestamp>;
 }
 
+export interface ReservationSubRound {
+  bookerId: string;
+  startDate: DateTime;
+  endDate: DateTime;
+}
+
 export interface ReservationRound {
   name: string;
   startDate: DateTime;
   endDate: DateTime;
-  subRoundBookerIds: string[];
+  subRounds: ReservationSubRound[];
   bookedWeeksLimit: number;
   allowDailyReservations: boolean;
   allowDeletions: boolean;
@@ -62,7 +68,7 @@ export interface ReservationRound {
 
 export interface ReservationRoundDefinition {
   name: string;
-  durationWeeks?: number;
+  durationDays: number;
   subRoundBookerIds?: string[];
   bookedWeeksLimit?: number;
   allowDailyReservations?: boolean;

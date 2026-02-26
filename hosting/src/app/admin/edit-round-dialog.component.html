@@ -35,16 +35,23 @@
     </mat-button-toggle-group>
     <div>&nbsp;</div>
   </div>
-  <p>Round duration:</p>
+  <p>Round type:</p>
   <div>
     <mat-button-toggle-group
       [(ngModel)]="isRoundRobin"
-      aria-label="Is round robin"
+      aria-label="Round type"
     >
       <mat-button-toggle [value]="true">Priority rounds</mat-button-toggle>
       <mat-button-toggle [value]="false">Duration</mat-button-toggle>
     </mat-button-toggle-group>
     <div>&nbsp;</div>
+  </div>
+  <div>
+    <mat-form-field>
+      <mat-label>{{ isRoundRobin() ? 'Sub-round duration (days)' : 'Duration (days)' }}</mat-label>
+      <input matInput type="number" [(ngModel)]="durationDays" min="1"/>
+      <mat-error>Duration must be at least one</mat-error>
+    </mat-form-field>
   </div>
   @if (isRoundRobin()) {
     @let numBookers = subRoundBookerIds()?.length || 0;
@@ -63,14 +70,6 @@
           </mat-list-item>
         }
       </mat-list>
-    </div>
-  } @else {
-    <div>
-      <mat-form-field>
-        <mat-label>Duration (weeks)</mat-label>
-        <input matInput type="number" [(ngModel)]="durationWeeks" min="1"/>
-        <mat-error>Duration must be at least one</mat-error>
-      </mat-form-field>
     </div>
   }
   <div>
