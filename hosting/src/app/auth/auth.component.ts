@@ -12,6 +12,8 @@ import {MatError} from '@angular/material/form-field';
 import {ANIMATION_SETTINGS} from '../app.config';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
+import {TodayService} from '../utility/today-service';
+import {DateTime} from 'luxon';
 
 // TODO bring this to RxFire
 function _authState(auth: Auth): Observable<User | null> {
@@ -36,9 +38,9 @@ export const authState = ɵzoneWrap(_authState, true);
   imports: [AsyncPipe, MatError, MatIcon, MatIconButton, MatButton]
 })
 export class AuthComponent implements OnDestroy {
-
   private readonly auth = inject(Auth);
   protected readonly authState = authState(this.auth);
+  private readonly todayService = inject(TodayService);
 
   protected readonly user = this.authState.pipe();
 
@@ -88,6 +90,8 @@ export class AuthComponent implements OnDestroy {
   }
 
   async logout() {
+    // Reset the today service to now, in case a signing-out admin had overridden it
+    this.todayService.today = DateTime.now();
     return await signOut(this.auth);
   }
 
