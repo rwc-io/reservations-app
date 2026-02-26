@@ -142,10 +142,24 @@ export class DataService {
       // We need this to add in the id field.
       fromFirestore: snapshot => {
         const {rounds, startDate, year} = snapshot.data();
+        /* eslint-disable  @typescript-eslint/no-explicit-any */
+        const convertedRounds = (rounds as any[]).map(round => {
+          const {durationWeeks, ...rest} = round;
+          if (durationWeeks !== undefined && rest.durationDays === undefined) {
+            return {...rest, durationDays: durationWeeks * 7};
+          }
+          if (rest.durationDays=== undefined && round.subRoundBookerIds?.length > 0) {
+            return {...rest, durationDays: 7};
+          }
+          return rest;
+        });
         const {id} = snapshot;
-        return {id, rounds, startDate, year};
+        return {id, rounds: convertedRounds, startDate, year};
       },
-      toFirestore: (it: never) => it,
+      toFirestore: (it: ReservationRoundsConfig) => {
+        const {id, ...rest} = it;
+        return rest;
+      },
     });
     const reservationsAuditLogCollection = collection(firestore, 'reservationsAuditLog');
     this.reservationsCollection = collection(firestore, 'reservations').withConverter<Reservation>({

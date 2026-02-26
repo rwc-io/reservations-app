@@ -46,8 +46,4 @@ export class RoundConfigComponent implements OnDestroy {
   bookerFor(bookerId: string): Booker | undefined {
     return this.dataService.bookers().find(booker => booker.id === bookerId);
   }
-
-  offsetDate(date: DateTime, weeks: number): DateTime {
-    return date.plus({days: weeks * 7});
-  }
 }

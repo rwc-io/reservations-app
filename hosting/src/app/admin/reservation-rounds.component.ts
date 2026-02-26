@@ -105,7 +105,7 @@ export class ReservationRoundsComponent implements OnDestroy {
     const dialogRef = this.dialog.open(EditRoundDialog, {
       data: {
         name: `Round ${this.reservationRoundsDefinitions().length + 1}`,
-        durationWeeks: 0,
+        durationDays: 0,
         bookedWeeksLimit: 0,
         allowDailyReservations: false,
         allowDeletions: false,
@@ -127,7 +127,7 @@ export class ReservationRoundsComponent implements OnDestroy {
     const dialogRef = this.dialog.open(EditRoundDialog, {
       data: {
         name: round.name,
-        durationWeeks: round.durationWeeks,
+        durationDays: round.durationDays,
         subRoundBookerIds: round.subRoundBookerIds,
         bookedWeeksLimit: round.bookedWeeksLimit,
         allowDailyReservations: round.allowDailyReservations || false,

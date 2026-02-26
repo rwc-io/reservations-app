@@ -3,12 +3,13 @@
     @for (round of rounds(); track round.startDate) {
       <li>
         Round {{ round.name }}: {{ round.startDate | shortDate }} – {{ round.endDate | shortDate }}
+        ({{ round.endDate.diff(round.startDate, 'days').days + 1 }} days)
         <ul>
-          @for (bookerId of round.subRoundBookerIds; track bookerId; let i = $index) {
+          @for (subRound of round.subRounds; track subRound.startDate) {
             <li>
-              {{ offsetDate(round.startDate, i) | shortDate }}
-              – {{ offsetDate(round.startDate, i + 1).plus({days: -1}) | shortDate }}:
-              {{ bookerFor(bookerId)?.name || 'unknown' }}
+              {{ subRound.startDate | shortDate }}
+              – {{ subRound.endDate | shortDate }}:
+              {{ bookerFor(subRound.bookerId)?.name || 'unknown' }}
             </li>
           }
           @if (round.bookedWeeksLimit > 0) {

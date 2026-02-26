@@ -22,7 +22,7 @@ export interface EditRoundDialogData {
   existingPosition?: number;
   bookers: Booker[];
   name: string;
-  durationWeeks?: number;
+  durationDays: number;
   subRoundBookerIds?: string[];
   bookedWeeksLimit?: number;
   allowDailyReservations: boolean;
@@ -62,7 +62,7 @@ export class EditRoundDialog {
   readonly bookers: Booker[];
   readonly existingPosition: number | undefined;
   readonly name = model('');
-  readonly durationWeeks: ModelSignal<number | undefined> = model(undefined as number | undefined);
+  readonly durationDays: ModelSignal<number> = model(-1);
   readonly subRoundBookerIds: ModelSignal<string[] | undefined> = model(undefined as string[] | undefined);
   readonly bookingLimitWeeks: ModelSignal<number | undefined> = model(undefined as number | undefined);
   readonly allowDailyReservations = model(false);
@@ -79,7 +79,7 @@ export class EditRoundDialog {
     this.bookers = data.bookers;
     this.existingPosition = data.existingPosition;
     this.name.set(data.name);
-    this.durationWeeks.set(data.durationWeeks);
+    this.durationDays.set(data.durationDays);
     this.subRoundBookerIds.set(data.subRoundBookerIds);
     this.bookingLimitWeeks.set(data.bookedWeeksLimit || 0);
     this.allowDailyReservations.set(data.allowDailyReservations);
@@ -90,10 +90,8 @@ export class EditRoundDialog {
     this.isRoundRobin.subscribe((isRoundRobin) => {
       if (isRoundRobin) {
         this.subRoundBookerIds.set(this.bookers.map(b => b.id));
-        this.durationWeeks.set(undefined);
       } else {
         this.subRoundBookerIds.set(undefined);
-        this.durationWeeks.set(0);
       }
     });
   }
@@ -107,10 +105,8 @@ export class EditRoundDialog {
 
   isValid(): boolean {
     return this.name().length > 0 &&
-      (!!this.subRoundBookerIds() || !!this.durationWeeks()) &&
-      !(!!this.subRoundBookerIds() && !!this.durationWeeks()) &&
       (!this.subRoundBookerIds() || this.subRoundBookerIds()!.length > 0) &&
-      (!this.durationWeeks() || this.durationWeeks()! > 0);
+      (this.durationDays() > 0);
   }
 
   onSubmit(): void {
@@ -125,8 +121,8 @@ export class EditRoundDialog {
     if (this.subRoundBookerIds()) {
       round.subRoundBookerIds = this.subRoundBookerIds();
     }
-    if (this.durationWeeks()) {
-      round.durationWeeks = this.durationWeeks();
+    if (this.durationDays()) {
+      round.durationDays = this.durationDays();
     }
 
     this.round.emit(round);

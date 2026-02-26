@@ -43,13 +43,13 @@ export class ReservationRoundsService implements OnDestroy {
 
     this.currentSubRoundBookerSubscription = combineLatest([toObservable(this.today), toObservable(this.currentRound), toObservable(this.dataService.bookers)]).subscribe({
       next: ([today, round, bookers]) => {
-        if (!round || !round.subRoundBookerIds.length) {
+        if (!round || !round.subRounds.length) {
           this.currentSubRoundBooker.set(undefined);
           return;
         }
 
-        const weekOffset = Math.floor(today.diff(round.startDate).as('days') / 7);
-        const bookerId = round.subRoundBookerIds[weekOffset];
+        const currentSubRound = round.subRounds.find(sr => sr.startDate <= today && sr.endDate >= today);
+        const bookerId = currentSubRound?.bookerId;
         const booker = bookers.find(booker => booker.id === bookerId);
         this.currentSubRoundBooker.set(booker);
       }, error: _error => {
@@ -68,22 +68,36 @@ export class ReservationRoundsService implements OnDestroy {
 
     return roundsConfig.rounds.map(round => {
       const roundStart = previousEndDate;
-      if (round.durationWeeks && round.subRoundBookerIds?.length) {
-        throw new Error(`Round "${round.name}" cannot have both durationWeeks and bookerOrder`);
+
+      let roundDurationDays: number;
+      if (round.subRoundBookerIds?.length) {
+        const numSubRounds = round.subRoundBookerIds.length;
+        roundDurationDays = numSubRounds * (round?.durationDays || 0);
+      } else {
+        roundDurationDays = round.durationDays || 0;
       }
 
-      const durationWeeks = round.durationWeeks || round.subRoundBookerIds?.length;
-      if (!durationWeeks || durationWeeks < 1) {
-        throw new Error(`Round "${round.name}" must have durationWeeks or bookerOrder`);
+      if (roundDurationDays < 1) {
+        throw new Error(`Round "${round.name}" duration is misconfigured`);
       }
 
-      const roundEnd = roundStart.plus({days: durationWeeks * 7 - 1});
+      const roundEnd = roundStart.plus({days: roundDurationDays - 1});
+
+      const subRounds = (round.subRoundBookerIds || []).map((bookerId, index) => {
+        const subRoundStart = roundStart.plus({days: index * round.durationDays});
+        return {
+          bookerId,
+          startDate: subRoundStart,
+          endDate: subRoundStart.plus({days: round.durationDays - 1}),
+        };
+      });
+
       previousEndDate = roundEnd.plus({days: 1});
       return {
         name: round.name,
         startDate: roundStart,
         endDate: roundEnd,
-        subRoundBookerIds: round.subRoundBookerIds || [],
+        subRounds,
         bookedWeeksLimit: round.bookedWeeksLimit || 0,
         allowDailyReservations: !!round.allowDailyReservations,
         allowDeletions: !!round.allowDeletions,
